@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Çukur Café</title>
+
+<style>
+/* Modern Reset & Base Styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #f5f5f5;
+  overflow-x: hidden;
+  background: #000;
+  line-height: 1.6;
+}
+
+/* Creator Tag (Top Right) with Red Neon Glow */
+.creator-tag {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 0.85rem;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  z-index: 10;
+  background: rgba(10, 5, 5, 0.8);
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid #ff1e1e;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  text-shadow: 0 0 8px rgba(255, 30, 30, 0.8);
+  box-shadow: 0 0 15px rgba(255, 30, 30, 0.3);
+}
+
+/* Full-screen Çukur GIF background layer */
+.bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnRwaWJpdGZkaDJzYXN6dW91cHB4MzUyb3N0c3JuZDdicGJyNTExaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifLnmjGWXRZrFbgC3O/giphy.gif");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -3;
+}
+
+/* Dark atmospheric vignette to frame the website */
+.bg-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%), rgba(0, 0, 0, 0.4);
+  z-index: -2;
+}
+
+/* Main Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 20px 100px 20px; /* Extra bottom padding for audio player spacing */
+}
+
+/* Header Styling with Strong Neon Glow */
+h1 {
+  text-align: center;
+  font-size: clamp(2.5rem, 6vw, 4.5rem); 
+  color: #ff1e1e;
+  text-shadow: 0 0 20px rgba(255, 30, 30, 0.8), 0 0 40px rgba(255, 30, 30, 0.5), 0 0 60px rgba(255, 30, 30, 0.3);
+  margin-bottom: 50px;
+  letter-spacing: 2px;
+  animation: glow 3s infinite alternate ease-in-out;
+}
+
+@keyframes glow {
+  from { text-shadow: 0 0 15px rgba(255, 30, 30, 0.8), 0 0 30px rgba(255, 30, 30, 0.5); }
+  to { text-shadow: 0 0 35px rgba(255, 30, 30, 1), 0 0 70px rgba(255, 30, 30, 0.7); }
+}
+
+/* Premium Card / Section Design */
+.section {
+  padding: 40px 30px;
+  text-align: center;
+  background: rgba(10, 5, 5, 0.75);
+  border: 1px solid rgba(255, 30, 30, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  margin-bottom: 40px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.section:hover {
+  border-color: rgba(255, 30, 30, 0.4);
+  box-shadow: 0 15px 40px rgba(255, 30, 30, 0.1);
+}
+
+.section h2 {
+  font-size: 1.8rem;
+  color: #fff;
+  margin-top: 0;
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.section p {
+  font-size: 1.1rem;
+  color: #e0e0e0;
+  margin-bottom: 0;
+}
+
+/* Server Owner Text with Vibrant Red Neon Glow */
+.owner-text {
+  display: block;
+  font-size: 0.9rem;
+  color: #fff;
+  margin-top: 15px;
+  margin-bottom: -5px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 30, 30, 0.9), 0 0 20px rgba(255, 30, 30, 0.4);
+}
+
+/* Grid Gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  padding: 15px 0;
+}
+
+/* Image Wrappers */
+.gallery-item {
+  overflow: hidden;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 30, 30, 0.3);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s, box-shadow 0.4s;
+  background: #0d0606;
+  height: 220px;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.5s ease;
+}
+
+.gallery-item:hover {
+  transform: translateY(-8px);
+  border-color: #ff1e1e;
+  box-shadow: 0 12px 30px rgba(255, 30, 30, 0.3);
+}
+
+.gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+/* Call to Action Button */
+button {
+  background: linear-gradient(135deg, #ff1e1e, #b30000);
+  border: none;
+  padding: 16px 40px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  border-radius: 30px;
+  box-shadow: 0 0 20px rgba(255, 30, 30, 0.4);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-top: 20px;
+  margin-right: 10px; /* Spacing between the buttons */
+  letter-spacing: 1px;
+}
+
+button:hover {
+  transform: scale(1.06) translateY(-2px);
+  box-shadow: 0 0 35px rgba(255, 30, 30, 0.7);
+  background: linear-gradient(135deg, #ff3333, #cc0000);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* High-Contrast Visible Audio Player Container (Bottom Right / Unten Rechts) */
+.audio-player-container {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  z-index: 100;
+  background: #1a1a1a; /* Dark solid fallback background */
+  border: 2px solid #ff1e1e;
+  border-radius: 14px;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 0 25px rgba(255, 30, 30, 0.6);
+}
+
+.audio-player-container span {
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #ff1e1e;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px rgba(255, 30, 30, 0.4);
+}
+
+/* Custom Minimalist Playback Control Styling */
+.play-btn {
+  background: #ff1e1e;
+  color: #fff;
+  border: none;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: none;
+  margin: 0;
+  letter-spacing: 0;
+}
+.play-btn:hover {
+  transform: none;
+  box-shadow: 0 0 10px #ff1e1e;
+}
+</style>
+</head>
+
+<body>
+
+<div class="creator-tag">Website created by KD Duran</div>
+
+<div class="bg"></div>
+<div class="bg-overlay"></div>
+
+<div class="container">
+
+  <h1>🩸 ÇUKUR <•••> 🩸</h1>
+
+  <div class="section">
+    <h2>Welcome to the Neighborhood</h2>
+    <p>Çukur is not a place. Çukur is a family. ❤️</p>
+  </div>
+
+  <div class="section">
+    <h2>📸 Cukur pictures</h2>
+    <div class="gallery">
+      <div class="gallery-item"><img src="https://i.pinimg.com/originals/f8/bf/ae/f8bfae1a713cc66e09d6e839156a59d2.png"></div>
+      <div class="gallery-item"><img src="https://w0.peakpx.com/wallpaper/44/396/HD-wallpaper-cukur-karakuzular-cukur-2019-cukur-pp-cukur-yeni-cukur.jpg"></div>
+      <div class="gallery-item"><img src="https://m.media-amazon.com/images/M/MV5BYmIyZjkxMjgtOTFlNi00OWU2LTgyOGEtNzkyMTEyMjVmMDg3XkEyXkFqcGc@._V1_.jpg"></div>
+      <div class="gallery-item"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpWOtArojTJE61v27Mhv5qj2Pns8aFio1TLVFXpsbguQ-YVsOj1uaMku0&s=10"></div>
+      <div class="gallery-item"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5Bjxqx_SragE7jw-4Lgkaf_XcR70d65bdNn_QCMO_gk4dlEbux1kvQDY&s=10"></div>
+      <div class="gallery-item"><img src="https://i.pinimg.com/236x/9b/25/a6/9b25a6131c968f71be1a4d3163d976d0.jpg"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🎥 Çukur GIFS</h2>
+    <div class="gallery">
+      <div class="gallery-item"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHozYW05czQ2Mm1iZHI1dG1hZzJqem1sYWYwcGk4N3kwdHd6aGEyMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XgZ16eV5nfxyrpKXoN/giphy.gif"></div>
+      <div class="gallery-item"><img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnRwaWJpdGZkaDJzYXN6dW91cHB4MzUyb3N0c3JuZDdicGJyNTExaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifLnmjGWXRZrFbgC3O/giphy.gif"></div>
+      <div class="gallery-item"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXVnZjVydnVzNHk1OGp5eWdpZWUwbXBpa2c0aWdvc2tnZ29saW14dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VHr5pzILwOowEqsIz5/giphy.gif"></div>
+      <div class="gallery-item"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTF3dHM4YnlnMzg1Y3AzY3Y4YmpvemVkaGUzdXZydnJhcnpzMTBndyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gw7XNxnRR9PXLFjau4/giphy.gif"></div>
+      <div class="gallery-item"><img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTlydWRoc2ZhZGVwOTJ3Y2liZTZyNm9lbDduNHNxazNodzJkcjd3OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XIjZpzU7Dw2z1ZvyKp/giphy.gif"></div>
+      <div class="gallery-item"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHE5OWY2aW16MnFmcGY0bTFoMng2dXlyaTJ0c291NXFybGs1eHF2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jkZpBZljxIWIYlm0pH/giphy.gif"></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Join the Family</h2>
+    <p>Click below to enter the Çukur world</p>
+    <small class="owner-text">Server Owner KD /CEO OWNER Kaan_330</small>
+    <br>
+    <button onclick="window.open('https://discord.gg/zrMp8zwhCW')">Join Discord</button>
+    <button onclick="window.open('https://guns.lol/kd_kaan')">Guns.lol</button>
+  </div>
+
+</div>
+
+<div id="yt-player" style="display: none;"></div>
+
+<div class="audio-player-container">
+  <span>Müzik</span>
+  <button class="play-btn" id="togglePlayBtn" onclick="togglePlayback()">LOADING...</button>
+</div>
+
+<script>
+  // Load the YouTube API framework asynchronously
+  var tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  var player;
+  var hasInteracted = false;
+
+  function onYouTubeIframeAPIReady() {
+    player = new YT.Player('yt-player', {
+      height: '0',
+      width: '0',
+      videoId: '_Iq_uEZuqGg',
+      playerVars: {
+        'autoplay': 1,
+        'loop': 1,
+        'playlist': '_Iq_uEZuqGg',
+        'controls': 0
+      },
+      events: {
+        'onReady': onPlayerReady
+      }
+    });
+  }
+
+  function onPlayerReady(event) {
+    // Attempt instant unmuted playback right out of the gate
+    player.unMute();
+    player.setVolume(100);
+    player.playVideo();
+    
+    // Check if the browser allowed immediate sound or blocked it
+    setTimeout(() => {
+      if (player.getPlayerState() === 1) { // 1 means Playing
+        document.getElementById('togglePlayBtn').innerText = "PAUSE";
+        hasInteracted = true;
+      } else {
+        document.getElementById('togglePlayBtn').innerText = "TAP TO PLAY";
+      }
+    }, 1000);
+  }
+
+  // Fallback sound trigger: plays instantly upon any touch, click, or scroll movement
+  const soundBypass = () => {
+    if (!hasInteracted && player && typeof player.unMute === 'function') {
+      player.unMute();
+      player.setVolume(100);
+      player.playVideo();
+      document.getElementById('togglePlayBtn').innerText = "PAUSE";
+      hasInteracted = true;
+      
+      window.removeEventListener('click', soundBypass);
+      window.removeEventListener('touchstart', soundBypass);
+      window.removeEventListener('scroll', soundBypass);
+    }
+  };
+
+  window.addEventListener('click', soundBypass);
+  window.addEventListener('touchstart', soundBypass);
+  window.addEventListener('scroll', soundBypass);
+
+  // Manual Control Panel Button
+  function togglePlayback() {
+    if (!player || typeof player.getPlayerState !== 'function') return;
+    
+    var state = player.getPlayerState();
+    var btn = document.getElementById('togglePlayBtn');
+    
+    if (state === 1) {
+      player.pauseVideo();
+      btn.innerText = "PLAY";
+    } else {
+      player.unMute();
+      player.setVolume(100);
+      player.playVideo();
+      btn.innerText = "PAUSE";
+      hasInteracted = true;
+    }
+  }
+</script>
+
+</body>
+</html>
+
+<script defer data-domain="html.cafe" src="https://milkymouse.com/js/script.js"></script>
+
+   
