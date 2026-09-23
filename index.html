@@ -4,389 +4,1116 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Çukur Café</title>
-
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-/* Modern Reset & Base Styles */
-* {
-  box-sizing: border-box;
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color:#f5f5f5;
+  overflow-x:hidden;
+  background:#000;
+  line-height:1.6;
+  min-height:100vh;
+  position:relative;
+  -webkit-font-smoothing:antialiased;
 }
+body.locked{overflow:hidden}
 
-body {
-  margin: 0;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color: #f5f5f5;
-  overflow-x: hidden;
-  background: #000;
-  line-height: 1.6;
-}
+/* ============ SCROLL PROGRESS BAR ============ */
+#scroll-progress{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#ff1e1e,#ff5555,#ff1e1e);background-size:200% 100%;z-index:2000;box-shadow:0 0 15px rgba(255,30,30,.9),0 0 30px rgba(255,30,30,.5);transition:width .1s linear;animation:shimmer 2s linear infinite;pointer-events:none}
 
-/* Creator Tag (Top Right) with Red Neon Glow */
-.creator-tag {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  font-size: 0.85rem;
-  color: #fff;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  z-index: 10;
-  background: rgba(10, 5, 5, 0.8);
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: 1px solid #ff1e1e;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  text-shadow: 0 0 8px rgba(255, 30, 30, 0.8);
-  box-shadow: 0 0 15px rgba(255, 30, 30, 0.3);
-}
+/* ============ ÇUKUR SYMBOL CURSOR (BLACK OUTLINE) ============ */
+@media (hover:hover) and (pointer:fine){
+  body{cursor:none}
+  a,button,input,textarea,.gallery-item,.section,.play-btn,.mini-btn,select{cursor:none}
 
-/* Full-screen Çukur GIF background layer */
-.bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnRwaWJpdGZkaDJzYXN6dW91cHB4MzUyb3N0c3JuZDdicGJyNTExaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifLnmjGWXRZrFbgC3O/giphy.gif");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: -3;
-}
+  .cursor-cukur{
+    position:fixed;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    pointer-events:none;
+    z-index:99998;
+    transform:translate(-50%,-50%);
+    font-family:'Cinzel','Segoe UI Symbol',serif;
+    font-size:26px;
+    font-weight:900;
+    line-height:1;
+    color:#ff1e1e;
+    -webkit-text-stroke:1.5px #000;
+    paint-order:stroke fill;
+    text-shadow:
+      -2px -2px 0 #000,
+       2px -2px 0 #000,
+      -2px  2px 0 #000,
+       2px  2px 0 #000,
+      -1px  0   0 #000,
+       1px  0   0 #000,
+       0   -1px 0 #000,
+       0    1px 0 #000;
+    transition:font-size .25s ease;
+    letter-spacing:-3px;
+  }
+  .cursor-cukur .cur-sym{
+    display:inline-block;
+    animation:curSymPulse 1.3s ease-in-out infinite;
+    transform-origin:center;
+    color:#ff1e1e;
+    -webkit-text-stroke:1.5px #000;
+  }
+  .cursor-cukur .cur-sym:last-child{animation-delay:.65s}
+  .cursor-cukur .cur-dot{
+    display:inline-block;
+    font-size:15px;
+    color:#ff5555;
+    animation:curDotPulse 1.3s ease-in-out infinite;
+    transform-origin:center;
+    -webkit-text-stroke:1px #000;
+  }
+  @keyframes curSymPulse{
+    0%,100%{opacity:1;transform:scale(1) rotate(0)}
+    50%{opacity:.65;transform:scale(1.22) rotate(7deg)}
+  }
+  @keyframes curDotPulse{
+    0%,100%{transform:scale(1);color:#ff1e1e}
+    50%{transform:scale(1.55);color:#ff7777}
+  }
 
-/* Dark atmospheric vignette to frame the website */
-.bg-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%), rgba(0, 0, 0, 0.4);
-  z-index: -2;
-}
+  .cursor-cukur.hover{font-size:38px}
+  .cursor-cukur.hover .cur-sym{color:#ff5555}
+  .cursor-cukur.hover .cur-dot{color:#ff8888}
 
-/* Main Container */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 60px 20px 100px 20px; /* Extra bottom padding for audio player spacing */
-}
+  .cursor-cukur.click{font-size:17px}
+  .cursor-cukur.click .cur-sym{animation-duration:.4s}
 
-/* Header Styling with Strong Neon Glow */
-h1 {
-  text-align: center;
-  font-size: clamp(2.5rem, 6vw, 4.5rem); 
-  color: #ff1e1e;
-  text-shadow: 0 0 20px rgba(255, 30, 30, 0.8), 0 0 40px rgba(255, 30, 30, 0.5), 0 0 60px rgba(255, 30, 30, 0.3);
-  margin-bottom: 50px;
-  letter-spacing: 2px;
-  animation: glow 3s infinite alternate ease-in-out;
+  /* Blood drop trail */
+  .cursor-drop{
+    position:fixed;width:5px;height:5px;
+    background:radial-gradient(circle at 50% 30%,#ff5555,#8b0000);
+    border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+    pointer-events:none;z-index:99997;transform:translate(-50%,-50%);
+    box-shadow:0 0 6px rgba(255,30,30,.7);opacity:.85;
+    border:1px solid #000;
+  }
 }
+@media (hover:none){.cursor-cukur,.cursor-drop{display:none!important}}
 
-@keyframes glow {
-  from { text-shadow: 0 0 15px rgba(255, 30, 30, 0.8), 0 0 30px rgba(255, 30, 30, 0.5); }
-  to { text-shadow: 0 0 35px rgba(255, 30, 30, 1), 0 0 70px rgba(255, 30, 30, 0.7); }
-}
+/* ============ PRELOADER ============ */
+#preloader{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at center,#1a0505,#000);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:25px;transition:opacity .8s,visibility .8s}
+#preloader.done{opacity:0;visibility:hidden}
+.pre-title{font-family:'Cinzel',serif;font-size:2rem;letter-spacing:8px;color:#ff1e1e;text-transform:uppercase;text-shadow:0 0 30px rgba(255,30,30,.9),0 0 60px rgba(255,30,30,.5);animation:preBlink 1.4s ease-in-out infinite}
+@keyframes preBlink{0%,100%{opacity:1}50%{opacity:.3}}
+.pre-bar{width:280px;height:3px;background:rgba(255,30,30,.15);border-radius:3px;overflow:hidden}
+.pre-bar-fill{height:100%;width:0;background:linear-gradient(90deg,#8b0000,#ff1e1e,#ff5555,#ff1e1e);background-size:200% 100%;animation:preBarFill 2.2s ease-out forwards,shimmer 1.5s linear infinite}
+@keyframes preBarFill{0%{width:0}100%{width:100%}}
+@keyframes shimmer{0%{background-position:0% center}100%{background-position:200% center}}
+.pre-percent{font-family:'Cinzel',serif;font-size:.85rem;color:#ff5555;letter-spacing:3px;font-weight:800}
 
-/* Premium Card / Section Design */
-.section {
-  padding: 40px 30px;
-  text-align: center;
-  background: rgba(10, 5, 5, 0.75);
-  border: 1px solid rgba(255, 30, 30, 0.2);
-  border-radius: 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  margin-bottom: 40px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8);
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
-}
+/* ============ BACKGROUNDS ============ */
+.bg{position:fixed;top:0;left:0;width:100%;height:100%;background-image:url("https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnRwaWJpdGZkaDJzYXN6dW91cHB4MzUyb3N0c3JuZDdicGJyNTExaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifLnmjGWXRZrFbgC3O/giphy.gif");background-size:cover;background-position:center;background-repeat:no-repeat;z-index:-4;animation:bgFloat 20s ease-in-out infinite alternate;filter:saturate(1.2)}
+@keyframes bgFloat{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.08) translate(-10px,-8px)}}
+.bg-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 50% 50%,rgba(255,30,30,.08) 0%,transparent 55%),radial-gradient(circle,rgba(0,0,0,.2) 0%,rgba(0,0,0,.88) 100%),rgba(0,0,0,.4);z-index:-3;animation:overlayPulse 6s ease-in-out infinite alternate}
+@keyframes overlayPulse{0%{opacity:.95}100%{opacity:1}}
+.scanlines{position:fixed;inset:0;z-index:-2;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0px,rgba(0,0,0,.18) 1px,transparent 1px,transparent 3px);opacity:.4;mix-blend-mode:overlay}
+.rings{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:-2;pointer-events:none;opacity:.3}
+.ring{position:absolute;top:50%;left:50%;border:1px solid rgba(255,30,30,.4);border-radius:50%;transform:translate(-50%,-50%);animation:ringSpin 25s linear infinite}
+.ring:nth-child(1){width:420px;height:420px;animation-duration:30s}
+.ring:nth-child(2){width:660px;height:660px;border-color:rgba(255,30,30,.2);animation-duration:42s;animation-direction:reverse}
+.ring:nth-child(3){width:900px;height:900px;border-color:rgba(255,30,30,.12);animation-duration:60s;border-style:dashed}
+@keyframes ringSpin{0%{transform:translate(-50%,-50%) rotate(0)}100%{transform:translate(-50%,-50%) rotate(360deg)}}
+#particles-canvas{position:fixed;inset:0;z-index:-1;pointer-events:none}
+.spotlight{position:fixed;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(255,30,30,.16) 0%,transparent 65%);pointer-events:none;z-index:-1;transform:translate(-50%,-50%);transition:opacity .3s}
 
-.section:hover {
-  border-color: rgba(255, 30, 30, 0.4);
-  box-shadow: 0 15px 40px rgba(255, 30, 30, 0.1);
-}
+/* ============ ADBLOCK SHIELD ============ */
+#adblock-shield{position:fixed;bottom:25px;left:25px;z-index:1500;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,rgba(20,5,5,.95),rgba(0,0,0,.95));border:2px solid rgba(255,30,30,.7);border-radius:50px;padding:10px 18px;box-shadow:0 10px 40px rgba(0,0,0,.8),0 0 40px rgba(255,30,30,.4);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px);font-size:.72rem;font-weight:800;color:#ff5555;letter-spacing:1px;text-transform:uppercase;animation:shieldPulse 3s ease-in-out infinite;transition:all .4s}
+#adblock-shield:hover{transform:translateY(-3px) scale(1.05);border-color:#ff5555}
+#adblock-shield .dot{width:8px;height:8px;border-radius:50%;background:#2ecc71;box-shadow:0 0 10px #2ecc71;animation:pulse 2s infinite}
+#adblock-shield .blocked-count{background:rgba(255,30,30,.4);border:1px solid rgba(255,30,30,.7);padding:2px 8px;border-radius:50px;font-size:.65rem;color:#fff;font-family:'Cinzel',serif;margin-left:4px;min-width:24px;text-align:center}
+#adblock-shield .blocked-count.bump{animation:blockBump .6s ease}
+@keyframes blockBump{0%,100%{transform:scale(1)}50%{transform:scale(1.4);background:#ff1e1e;color:#fff}}
+@keyframes shieldPulse{0%,100%{box-shadow:0 10px 40px rgba(0,0,0,.8),0 0 30px rgba(255,30,30,.4)}50%{box-shadow:0 10px 40px rgba(0,0,0,.8),0 0 55px rgba(255,30,30,.75)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
 
-.section h2 {
-  font-size: 1.8rem;
-  color: #fff;
-  margin-top: 0;
-  margin-bottom: 20px;
-  letter-spacing: 1px;
-}
+/* ============ TOP-LEFT STACK ============ */
+.top-left-stack{position:fixed;top:18px;left:22px;z-index:130;display:flex;flex-direction:column;gap:8px;align-items:flex-start;pointer-events:none}
+.top-left-stack > *{pointer-events:auto}
+.counter-wrap{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(20,5,5,.92),rgba(0,0,0,.92));border:1px solid rgba(255,30,30,.55);padding:8px 16px;border-radius:50px;box-shadow:0 0 25px rgba(255,30,30,.35);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.counter-wrap .eye{font-size:1rem;filter:drop-shadow(0 0 8px rgba(255,30,30,.9));animation:eyeBlink 3s ease-in-out infinite}
+@keyframes eyeBlink{0%,90%,100%{transform:scale(1)}95%{transform:scale(1.3)}}
+.counter-wrap .count{font-family:'Cinzel',serif;font-size:1.05rem;font-weight:900;color:#ff5555;text-shadow:0 0 14px rgba(255,30,30,.9);letter-spacing:1px;transition:all .3s;min-width:24px;text-align:center;display:inline-block}
+.counter-wrap .count.bump{transform:scale(1.35);color:#fff;text-shadow:0 0 25px #fff,0 0 40px #ff1e1e}
+.counter-wrap .label{color:#ff5555;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;font-weight:800}
 
-.section p {
-  font-size: 1.1rem;
-  color: #e0e0e0;
-  margin-bottom: 0;
-}
+/* ============ CREATOR TAG (TOP RIGHT) ============ */
+.creator-tag{position:fixed;top:20px;right:25px;font-size:.78rem;color:#fff;letter-spacing:1px;text-transform:uppercase;z-index:100;background:rgba(10,5,5,.85);padding:10px 18px;border-radius:20px;border:1px solid #ff1e1e;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);text-shadow:0 0 8px rgba(255,30,30,.8);box-shadow:0 0 15px rgba(255,30,30,.4);animation:tagGlow 3s ease-in-out infinite alternate;text-align:right;line-height:1.35;max-width:270px}
+.creator-tag strong{display:block;font-family:'Cinzel',serif;font-size:.9rem;color:#ff5555;letter-spacing:2px;margin-bottom:2px;text-shadow:0 0 12px rgba(255,30,30,.9)}
+.creator-tag small{display:block;font-size:.62rem;color:#a89080;letter-spacing:1px;text-transform:none;font-weight:500;margin-top:3px;text-shadow:none}
+.creator-tag a{display:inline-block;margin-top:6px;color:#ff5555;text-decoration:none;font-size:.68rem;font-weight:800;letter-spacing:1.5px;padding:3px 10px;border:1px solid rgba(255,30,30,.6);border-radius:50px;transition:all .3s}
+.creator-tag a:hover{background:rgba(255,30,30,.2);color:#fff;box-shadow:0 0 15px rgba(255,30,30,.6)}
+@keyframes tagGlow{0%{box-shadow:0 0 15px rgba(255,30,30,.3)}100%{box-shadow:0 0 30px rgba(255,30,30,.8),0 0 50px rgba(255,30,30,.4)}}
 
-/* Server Owner Text with Vibrant Red Neon Glow */
-.owner-text {
-  display: block;
-  font-size: 0.9rem;
-  color: #fff;
-  margin-top: 15px;
-  margin-bottom: -5px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-weight: bold;
-  text-shadow: 0 0 10px rgba(255, 30, 30, 0.9), 0 0 20px rgba(255, 30, 30, 0.4);
-}
+/* ============ MUSIC GATE ============ */
+#musicGate{position:fixed;inset:0;z-index:5000;background:radial-gradient(circle at center,rgba(20,5,5,.98),rgba(0,0,0,1));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:20px;transition:all .9s cubic-bezier(.7,0,.3,1);overflow:hidden}
+#musicGate::before{content:'';position:absolute;inset:-100px;background:radial-gradient(circle at center,rgba(255,30,30,.14) 0%,transparent 60%);animation:pulseBig 4s ease-in-out infinite;pointer-events:none}
+#musicGate::after{content:'';position:absolute;inset:0;background:repeating-conic-gradient(from 0deg,rgba(255,30,30,.06) 0deg 15deg,transparent 15deg 30deg);animation:gateRotate 60s linear infinite;pointer-events:none;opacity:.5}
+@keyframes gateRotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+@keyframes pulseBig{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:1}}
+.gate-emblem{font-family:'Cinzel',serif;font-size:3.2rem;color:#ff1e1e;letter-spacing:6px;text-shadow:0 0 40px rgba(255,30,30,.9),0 0 80px rgba(255,30,30,.6);z-index:1;text-align:center;animation:emblemPulse 3s ease-in-out infinite}
+@keyframes emblemPulse{0%,100%{transform:scale(1);text-shadow:0 0 40px rgba(255,30,30,.9),0 0 80px rgba(255,30,30,.6)}50%{transform:scale(1.05);text-shadow:0 0 60px rgba(255,30,30,1),0 0 120px rgba(255,30,30,.8)}}
+.gate-title{font-family:'Cinzel',serif;font-size:2.2rem;font-weight:900;color:#ff1e1e;letter-spacing:5px;text-shadow:0 0 40px rgba(255,30,30,.8),0 0 80px rgba(255,30,30,.5);z-index:1;text-align:center;text-transform:uppercase}
+.gate-sub{color:#ff5555;font-size:.92rem;letter-spacing:3px;text-transform:uppercase;font-weight:700;animation:blink 1.5s ease-in-out infinite;z-index:1;text-align:center}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.gate-player-wrap{position:relative;width:100%;max-width:640px;border-radius:20px;overflow:hidden;border:2px solid rgba(255,30,30,.7);box-shadow:0 0 60px rgba(255,30,30,.6),0 30px 80px rgba(0,0,0,.9);background:#000;z-index:1;transition:all .8s cubic-bezier(.7,0,.3,1)}
+.gate-player-wrap::before{content:'';position:absolute;inset:-3px;border-radius:22px;background:conic-gradient(from 0deg,#ff1e1e,#8b0000,#ff5555,#ff1e1e);animation:borderRotate 5s linear infinite;z-index:-1}
+@keyframes borderRotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+.gate-player-inner{position:relative;width:100%;padding-top:56.25%}
+.gate-player-inner iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.gate-live{position:absolute;top:14px;right:14px;z-index:11;display:flex;align-items:center;gap:6px;background:rgba(0,0,0,.8);border:1px solid rgba(255,30,30,.6);padding:6px 12px;border-radius:50px;font-size:.7rem;font-weight:800;color:#ff5555;letter-spacing:1.5px;text-transform:uppercase;backdrop-filter:blur(10px)}
+.gate-live .live-dot{width:8px;height:8px;border-radius:50%;background:#ff1e1e;box-shadow:0 0 10px #ff1e1e;animation:livePulse 1s infinite}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+.gate-track-info{position:absolute;bottom:14px;left:14px;z-index:11;background:rgba(0,0,0,.75);border:1px solid rgba(255,30,30,.55);padding:6px 12px;border-radius:50px;font-size:.7rem;font-weight:800;color:#fff;letter-spacing:1px;backdrop-filter:blur(10px);max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gate-unlock-btn{background:linear-gradient(135deg,#ff1e1e,#8b0000);border:3px solid #ff5555;color:#fff;padding:20px 48px;border-radius:50px;font-weight:900;font-size:1.1rem;letter-spacing:3px;cursor:pointer;text-transform:uppercase;box-shadow:0 15px 50px rgba(255,30,30,.9),0 0 60px rgba(255,30,30,.6);transition:all .3s;animation:btnPulse 2s ease-in-out infinite;z-index:1;display:flex;align-items:center;gap:12px;position:relative;overflow:hidden;font-family:inherit}
+.gate-unlock-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:btnShine 2.5s ease-in-out infinite}
+@keyframes btnShine{0%{left:-100%}100%{left:200%}}
+@keyframes btnPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.gate-unlock-btn:hover{transform:scale(1.12);box-shadow:0 20px 70px rgba(255,30,30,1),0 0 90px rgba(255,30,30,.9)}
+.gate-desc{color:#a89080;font-size:.88rem;max-width:540px;line-height:1.7;text-align:center;z-index:1}
+.gate-hint{color:#7a6555;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;text-align:center;z-index:1}
 
-/* Grid Gallery */
-.gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 25px;
-  padding: 15px 0;
-}
+#musicGate.minimized{inset:auto 25px 25px auto;width:340px;height:auto;padding:12px;gap:10px;background:linear-gradient(135deg,rgba(20,5,5,.96),rgba(0,0,0,.96));border:2px solid rgba(255,30,30,.7);border-radius:18px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 15px 50px rgba(0,0,0,.9),0 0 40px rgba(255,30,30,.5);animation:miniPop .6s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes miniPop{0%{transform:scale(.3) rotate(-10deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+#musicGate.minimized::before,#musicGate.minimized::after{display:none}
+#musicGate.minimized .gate-emblem,#musicGate.minimized .gate-title,#musicGate.minimized .gate-sub,#musicGate.minimized .gate-desc,#musicGate.minimized .gate-unlock-btn,#musicGate.minimized .gate-hint{display:none}
+#musicGate.minimized .gate-player-wrap{max-width:100%;border-radius:12px;border-width:1px;box-shadow:none}
+#musicGate.minimized .gate-player-wrap::before{display:none}
+#musicGate.minimized .gate-live,#musicGate.minimized .gate-track-info{display:none}
+.mini-controls{display:none;width:100%;gap:8px;align-items:center}
+#musicGate.minimized .mini-controls{display:flex}
+.mini-title{flex:1;font-family:'Cinzel',serif;font-size:.7rem;font-weight:800;color:#ff5555;letter-spacing:1px;line-height:1.15;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini-bars{display:flex;align-items:flex-end;gap:2px;height:16px;flex-shrink:0}
+.mini-bars .bar{width:2px;background:linear-gradient(180deg,#ff5555,#ff1e1e);border-radius:1px;animation:barDance 1s ease-in-out infinite;box-shadow:0 0 6px rgba(255,30,30,.7)}
+.mini-bars .bar:nth-child(1){animation-delay:0s;height:40%}
+.mini-bars .bar:nth-child(2){animation-delay:.2s;height:80%}
+.mini-bars .bar:nth-child(3){animation-delay:.4s;height:60%}
+.mini-bars .bar:nth-child(4){animation-delay:.1s;height:90%}
+.mini-bars.paused .bar{animation-play-state:paused;opacity:.3}
+@keyframes barDance{0%,100%{transform:scaleY(.4);opacity:.7}50%{transform:scaleY(1);opacity:1}}
+.mini-btn{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#ff1e1e,#8b0000);border:2px solid rgba(255,30,30,.5);color:#fff;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:.85rem;transition:all .3s;flex-shrink:0;font-family:inherit;padding:0}
+.mini-btn:hover{transform:scale(1.1);box-shadow:0 0 20px rgba(255,30,30,.8)}
+.mini-btn.close{background:rgba(255,255,255,.05);border-color:rgba(255,30,30,.5);color:#ff5555}
 
-/* Image Wrappers */
-.gallery-item {
-  overflow: hidden;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 30, 30, 0.3);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-  transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), border-color 0.4s, box-shadow 0.4s;
-  background: #0d0606;
-  height: 220px;
-}
+#unlock-badge{position:fixed;top:80px;right:20px;z-index:1400;display:none;align-items:center;gap:8px;background:linear-gradient(135deg,rgba(46,204,113,.15),rgba(46,204,113,.05));border:1px solid rgba(46,204,113,.6);padding:8px 16px;border-radius:50px;font-size:.7rem;font-weight:800;color:#2ecc71;letter-spacing:2px;text-transform:uppercase;box-shadow:0 0 30px rgba(46,204,113,.3);backdrop-filter:blur(10px)}
+#unlock-badge.active{display:flex;animation:badgePop .5s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes badgePop{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0)}}
+#unlock-badge::before{content:'';width:8px;height:8px;border-radius:50%;background:#2ecc71;box-shadow:0 0 10px #2ecc71;animation:pulse 2s infinite}
 
-.gallery-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.5s ease;
-}
+/* ============ CONFETTI / RIPPLE ============ */
+.confetti-piece{position:fixed;width:10px;height:10px;z-index:9998;pointer-events:none;top:-20px;animation:confettiFall linear forwards}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.ripple{position:fixed;border-radius:50%;background:radial-gradient(circle,rgba(255,30,30,.6),rgba(139,0,0,.3),transparent 70%);transform:translate(-50%,-50%) scale(0);pointer-events:none;z-index:9996;animation:rippleAnim .7s ease-out forwards}
+@keyframes rippleAnim{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
 
-.gallery-item:hover {
-  transform: translateY(-8px);
-  border-color: #ff1e1e;
-  box-shadow: 0 12px 30px rgba(255, 30, 30, 0.3);
-}
+/* ============ MAIN CONTAINER ============ */
+.container{max-width:1200px;margin:0 auto;padding:140px 20px 140px 20px;position:relative;z-index:1}
 
-.gallery-item:hover img {
-  transform: scale(1.05);
-}
+/* ============ H1 ============ */
+h1{text-align:center;font-family:'Cinzel',serif;font-size:clamp(2.5rem,6vw,4.5rem);color:#ff1e1e;text-shadow:0 0 20px rgba(255,30,30,.8),0 0 40px rgba(255,30,30,.5),0 0 60px rgba(255,30,30,.3);margin-bottom:50px;letter-spacing:4px;animation:glow 3s infinite alternate ease-in-out;position:relative;line-height:1.1}
+@keyframes glow{from{text-shadow:0 0 15px rgba(255,30,30,.8),0 0 30px rgba(255,30,30,.5)}to{text-shadow:0 0 35px rgba(255,30,30,1),0 0 70px rgba(255,30,30,.7),0 0 100px rgba(255,30,30,.4)}}
+.glitch{position:relative;display:inline-block}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%}
+.glitch::before{color:#ff1e1e;animation:glitch1 3s infinite linear alternate-reverse}
+.glitch::after{color:#ff5555;animation:glitch2 2.5s infinite linear alternate-reverse}
+@keyframes glitch1{0%,90%,100%{clip-path:inset(0 0 100% 0);transform:translate(0)}92%{clip-path:inset(20% 0 40% 0);transform:translate(-4px,2px)}94%{clip-path:inset(60% 0 10% 0);transform:translate(4px,-2px)}96%{clip-path:inset(40% 0 30% 0);transform:translate(-3px,1px)}}
+@keyframes glitch2{0%,88%,100%{clip-path:inset(0 0 100% 0);transform:translate(0)}90%{clip-path:inset(50% 0 20% 0);transform:translate(4px,-2px)}93%{clip-path:inset(10% 0 60% 0);transform:translate(-4px,3px)}}
 
-/* Call to Action Button */
-button {
-  background: linear-gradient(135deg, #ff1e1e, #b30000);
-  border: none;
-  padding: 16px 40px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: white;
-  cursor: pointer;
-  border-radius: 30px;
-  box-shadow: 0 0 20px rgba(255, 30, 30, 0.4);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-top: 20px;
-  margin-right: 10px; /* Spacing between the buttons */
-  letter-spacing: 1px;
-}
+/* ============ SECTIONS ============ */
+.section{padding:40px 30px;text-align:center;background:rgba(10,5,5,.78);border:1px solid rgba(255,30,30,.2);border-radius:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);margin-bottom:40px;box-shadow:0 15px 35px rgba(0,0,0,.8);transition:border-color .4s ease,box-shadow .4s ease,transform .4s ease;position:relative;overflow:hidden;animation:cardBreathe 6s ease-in-out infinite}
+@keyframes cardBreathe{0%,100%{box-shadow:0 15px 35px rgba(0,0,0,.8),0 0 0 rgba(255,30,30,0)}50%{box-shadow:0 18px 42px rgba(0,0,0,.85),0 0 40px rgba(255,30,30,.12)}}
+.section::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,30,30,.08),transparent);transition:left .8s ease;pointer-events:none}
+.section:hover::before{left:150%}
+.section::after{content:'';position:absolute;inset:0;border-radius:16px;pointer-events:none;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(255,30,30,.15),transparent 40%);opacity:0;transition:opacity .4s}
+.section:hover::after{opacity:1}
+.section:hover{border-color:rgba(255,30,30,.6);box-shadow:0 15px 40px rgba(255,30,30,.2),0 0 60px rgba(255,30,30,.15);transform:translateY(-4px)}
+.section h2{font-size:1.8rem;font-family:'Cinzel',serif;color:#fff;margin-top:0;margin-bottom:20px;letter-spacing:2px;text-shadow:0 0 15px rgba(255,30,30,.5);position:relative;display:inline-block}
+.section h2::after{content:'';position:absolute;left:0;right:0;bottom:-6px;height:1px;background:linear-gradient(90deg,transparent,rgba(255,30,30,.7),transparent);animation:titleShine 3s ease-in-out infinite}
+@keyframes titleShine{0%,100%{opacity:.3;transform:scaleX(.5)}50%{opacity:1;transform:scaleX(1)}}
+.section p{font-size:1.05rem;color:#e0e0e0;margin-bottom:14px}
+.section p:last-child{margin-bottom:0}
+.section a{color:#ff5555;text-decoration:underline;text-underline-offset:3px}
+.section a:hover{color:#ff1e1e}
 
-button:hover {
-  transform: scale(1.06) translateY(-2px);
-  box-shadow: 0 0 35px rgba(255, 30, 30, 0.7);
-  background: linear-gradient(135deg, #ff3333, #cc0000);
-}
+/* Hover music indicator */
+.section[data-hover-track]:hover h2::before{content:'🔊 ';color:#ff5555;animation:blink 1s ease-in-out infinite}
+.section[data-hover-track]{position:relative}
 
-button:active {
-  transform: scale(0.98);
-}
+/* About Çukur section */
+.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:25px;text-align:left}
+.about-card{padding:22px;background:rgba(255,30,30,.05);border:1px solid rgba(255,30,30,.25);border-radius:14px;transition:all .3s;position:relative;overflow:hidden}
+.about-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,#ff1e1e,#ff5555,#ff1e1e);background-size:200% 100%;opacity:0;transition:opacity .3s;animation:shimmer 2s linear infinite}
+.about-card:hover::before{opacity:1}
+.about-card:hover{border-color:rgba(255,30,30,.6);transform:translateY(-4px);box-shadow:0 10px 30px rgba(255,30,30,.2)}
+.about-card .icon{font-size:1.8rem;margin-bottom:8px;display:block;animation:iconBob 3s ease-in-out infinite}
+@keyframes iconBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.about-card h3{font-family:'Cinzel',serif;font-size:1rem;color:#ff5555;margin-bottom:8px;letter-spacing:1.5px;text-transform:uppercase}
+.about-card p{font-size:.9rem;color:#c9beb4;line-height:1.6;margin-bottom:0}
+.about-credit{font-size:.75rem;color:#7a6555;margin-top:18px;font-style:italic}
+.about-credit a{color:#ff5555}
 
-/* High-Contrast Visible Audio Player Container (Bottom Right / Unten Rechts) */
-.audio-player-container {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  z-index: 100;
-  background: #1a1a1a; /* Dark solid fallback background */
-  border: 2px solid #ff1e1e;
-  border-radius: 14px;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 0 25px rgba(255, 30, 30, 0.6);
-}
+/* Owner text */
+.owner-text{display:block;font-size:.9rem;color:#fff;margin-top:15px;margin-bottom:-5px;letter-spacing:1px;text-transform:uppercase;font-weight:bold;text-shadow:0 0 10px rgba(255,30,30,.9),0 0 20px rgba(255,30,30,.4);animation:ownerPulse 2s ease-in-out infinite alternate}
+@keyframes ownerPulse{0%{text-shadow:0 0 10px rgba(255,30,30,.9),0 0 20px rgba(255,30,30,.4)}100%{text-shadow:0 0 18px rgba(255,30,30,1),0 0 36px rgba(255,30,30,.6)}}
 
-.audio-player-container span {
-  font-size: 0.85rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: #ff1e1e;
-  text-transform: uppercase;
-  text-shadow: 0 0 8px rgba(255, 30, 30, 0.4);
-}
+/* ============ GALLERY ============ */
+.gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;padding:15px 0;perspective:1000px}
+.gallery-item{overflow:hidden;border-radius:12px;border:1px solid rgba(255,30,30,.3);box-shadow:0 8px 20px rgba(0,0,0,.6);transition:transform .5s cubic-bezier(.165,.84,.44,1),border-color .4s,box-shadow .4s;background:#0d0606;height:220px;position:relative;transform-style:preserve-3d}
+.gallery-item::before{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(135deg,rgba(255,30,30,.18),transparent 50%);opacity:0;transition:opacity .4s}
+.gallery-item::after{content:'';position:absolute;inset:-2px;border-radius:14px;z-index:-1;background:conic-gradient(from 0deg,#ff1e1e,#8b0000,#ff5555,#ff1e1e);opacity:0;transition:opacity .5s;animation:borderRotate 4s linear infinite}
+.gallery-item:hover::before{opacity:1}
+.gallery-item:hover::after{opacity:.9}
+.gallery-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease,filter .5s ease;filter:brightness(.9) saturate(1.1)}
+.gallery-item:hover{transform:translateY(-10px) scale(1.03);border-color:#ff1e1e;box-shadow:0 18px 40px rgba(255,30,30,.4),0 0 30px rgba(255,30,30,.3)}
+.gallery-item:hover img{transform:scale(1.12);filter:brightness(1.05) saturate(1.3)}
+.gallery-caption{position:absolute;bottom:0;left:0;right:0;padding:18px 14px 12px;background:linear-gradient(to top,rgba(0,0,0,.92),transparent);font-family:'Cinzel',serif;font-size:.78rem;font-weight:800;letter-spacing:1.5px;color:#ff5555;text-transform:uppercase;z-index:3;pointer-events:none;transform:translateY(6px);opacity:0;transition:all .4s}
+.gallery-item:hover .gallery-caption{transform:translateY(0);opacity:1}
 
-/* Custom Minimalist Playback Control Styling */
-.play-btn {
-  background: #ff1e1e;
-  color: #fff;
-  border: none;
-  padding: 6px 14px;
-  font-size: 0.8rem;
-  border-radius: 6px;
-  cursor: pointer;
-  box-shadow: none;
-  margin: 0;
-  letter-spacing: 0;
+/* ============ BUTTONS ============ */
+button:not(.mini-btn):not(.play-btn){background:linear-gradient(135deg,#ff1e1e,#b30000);border:none;padding:16px 40px;font-size:1.1rem;font-weight:bold;color:white;cursor:pointer;border-radius:30px;box-shadow:0 0 20px rgba(255,30,30,.4);transition:all .3s cubic-bezier(.175,.885,.32,1.275);margin-top:20px;margin-right:10px;letter-spacing:1px;font-family:inherit;position:relative;overflow:hidden}
+button:not(.mini-btn):not(.play-btn)::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:radial-gradient(circle,rgba(255,255,255,.4),transparent 70%);transform:translate(-50%,-50%);border-radius:50%;transition:width .6s ease,height .6s ease}
+button:not(.mini-btn):not(.play-btn):hover::before{width:300px;height:300px}
+button:not(.mini-btn):not(.play-btn):hover{transform:scale(1.06) translateY(-2px);box-shadow:0 0 35px rgba(255,30,30,.7),0 0 60px rgba(255,30,30,.4);background:linear-gradient(135deg,#ff3333,#cc0000)}
+button:not(.mini-btn):not(.play-btn):active{transform:scale(.98)}
+
+/* ============ SCROLL REVEAL ============ */
+.reveal{opacity:0;transform:translateY(60px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-scale{opacity:0;transform:scale(.88);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+
+/* ============ FLOATING EMOJI ============ */
+@keyframes floatUp{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:.15}90%{opacity:.15}100%{transform:translateY(-100vh) rotate(360deg);opacity:0}}
+.float-emoji{position:fixed;z-index:-1;opacity:.12;pointer-events:none;animation:floatUp 20s linear infinite}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar{width:12px}
+::-webkit-scrollbar-track{background:#0a0202}
+::-webkit-scrollbar-thumb{background:linear-gradient(#ff1e1e,#8b0000);border-radius:6px;border:2px solid #0a0202}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(#ff5555,#ff1e1e)}
+::selection{background:#ff1e1e;color:#fff}
+
+/* ============ AD-BLOCK CSS KILL ============ */
+.adsbygoogle,ins.adsbygoogle,iframe[src*="doubleclick"],iframe[src*="googlesyndication"],iframe[src*="googleadservices"],iframe[src*="adsystem"],iframe[src*="adservice"],div[id^="google_ads_"],div[class^="ad-"],div[id*="banner"],.advertisement,.ad-container,.ads-container,.sponsored,[data-ad-slot],[data-ad-client],[aria-label="Advertisement"]{display:none!important;width:0!important;height:0!important;visibility:hidden!important;pointer-events:none!important}
+.gate-player-inner iframe{display:block!important;width:100%!important;height:100%!important;visibility:visible!important;pointer-events:auto!important;opacity:1!important}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:900px){
+  .container{padding:130px 16px 120px}
+  h1{letter-spacing:2px}
+  .section{padding:30px 20px}
+  .section h2{font-size:1.4rem}
+  #adblock-shield{bottom:12px;left:12px;padding:7px 12px;font-size:.6rem;gap:6px}
+  .gate-title{font-size:1.6rem;letter-spacing:2px}
+  .gate-emblem{font-size:2.4rem;letter-spacing:3px}
+  .gate-unlock-btn{padding:16px 28px;font-size:.95rem;letter-spacing:2px}
+  .gate-desc{font-size:.8rem;padding:0 10px}
+  #musicGate.minimized{width:280px;inset:auto 12px 12px auto;padding:10px}
+  .mini-title{font-size:.62rem}
+  .mini-btn{width:42px;height:42px}
+  #unlock-badge{top:70px;right:12px;font-size:.6rem;padding:6px 12px}
+  .creator-tag{font-size:.65rem;padding:8px 12px;top:14px;right:14px;max-width:200px}
+  .creator-tag strong{font-size:.75rem}
+  .creator-tag small{font-size:.55rem}
+  .ring:nth-child(1){width:280px;height:280px}
+  .ring:nth-child(2){width:440px;height:440px}
+  .ring:nth-child(3){width:600px;height:600px}
+  .top-left-stack{top:14px;left:14px;gap:6px}
+  .counter-wrap{padding:6px 12px}
+  .counter-wrap .count{font-size:.9rem}
 }
-.play-btn:hover {
-  transform: none;
-  box-shadow: 0 0 10px #ff1e1e;
+@media (max-width:700px){
+  .counter-wrap .label{display:none}
+}
+@media (max-height:700px) and (max-width:900px){
+  #musicGate{gap:10px;padding:12px}
+  .gate-emblem{font-size:1.8rem}
+  .gate-title{font-size:1.3rem;letter-spacing:1px}
+  .gate-sub{font-size:.8rem}
+  .gate-desc{font-size:.75rem;max-width:90%}
+  .gate-hint{font-size:.65rem}
+  .gate-unlock-btn{padding:14px 22px;font-size:.85rem;letter-spacing:1px}
+}
+@media (max-width:520px){
+  h1{letter-spacing:1px}
+  .section h2{font-size:1.2rem;letter-spacing:1px}
+  .section p{font-size:.95rem}
+  .gallery{grid-template-columns:1fr 1fr;gap:14px}
+  .gallery-item{height:160px}
+  #musicGate.minimized{width:230px}
+  .mini-bars{display:none}
+  button:not(.mini-btn):not(.play-btn){padding:12px 24px;font-size:.9rem;width:100%;margin-right:0;margin-bottom:8px}
+  .about-grid{grid-template-columns:1fr}
+  .creator-tag{font-size:.55rem;padding:6px 10px;top:10px;right:10px;max-width:160px}
+  .creator-tag strong{font-size:.65rem}
+  .creator-tag small{display:none}
+  .top-left-stack{top:10px;left:10px;gap:5px}
 }
 </style>
 </head>
 
-<body>
+<body class="locked">
 
-<div class="creator-tag">Website created by KD Duran</div>
+<!-- SCROLL PROGRESS BAR -->
+<div id="scroll-progress"></div>
 
-<div class="bg"></div>
-<div class="bg-overlay"></div>
-
-<div class="container">
-
-  <h1>🩸 ÇUKUR <•••> 🩸</h1>
-
-  <div class="section">
-    <h2>Welcome to the Neighborhood</h2>
-    <p>Çukur is not a place. Çukur is a family. ❤️</p>
-  </div>
-
-  <div class="section">
-    <h2>📸 Cukur pictures</h2>
-    <div class="gallery">
-      <div class="gallery-item"><img src="https://i.pinimg.com/originals/f8/bf/ae/f8bfae1a713cc66e09d6e839156a59d2.png"></div>
-      <div class="gallery-item"><img src="https://w0.peakpx.com/wallpaper/44/396/HD-wallpaper-cukur-karakuzular-cukur-2019-cukur-pp-cukur-yeni-cukur.jpg"></div>
-      <div class="gallery-item"><img src="https://m.media-amazon.com/images/M/MV5BYmIyZjkxMjgtOTFlNi00OWU2LTgyOGEtNzkyMTEyMjVmMDg3XkEyXkFqcGc@._V1_.jpg"></div>
-      <div class="gallery-item"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpWOtArojTJE61v27Mhv5qj2Pns8aFio1TLVFXpsbguQ-YVsOj1uaMku0&s=10"></div>
-      <div class="gallery-item"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5Bjxqx_SragE7jw-4Lgkaf_XcR70d65bdNn_QCMO_gk4dlEbux1kvQDY&s=10"></div>
-      <div class="gallery-item"><img src="https://i.pinimg.com/236x/9b/25/a6/9b25a6131c968f71be1a4d3163d976d0.jpg"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>🎥 Çukur GIFS</h2>
-    <div class="gallery">
-      <div class="gallery-item"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHozYW05czQ2Mm1iZHI1dG1hZzJqem1sYWYwcGk4N3kwdHd6aGEyMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XgZ16eV5nfxyrpKXoN/giphy.gif"></div>
-      <div class="gallery-item"><img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnRwaWJpdGZkaDJzYXN6dW91cHB4MzUyb3N0c3JuZDdicGJyNTExaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifLnmjGWXRZrFbgC3O/giphy.gif"></div>
-      <div class="gallery-item"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXVnZjVydnVzNHk1OGp5eWdpZWUwbXBpa2c0aWdvc2tnZ29saW14dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VHr5pzILwOowEqsIz5/giphy.gif"></div>
-      <div class="gallery-item"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTF3dHM4YnlnMzg1Y3AzY3Y4YmpvemVkaGUzdXZydnJhcnpzMTBndyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gw7XNxnRR9PXLFjau4/giphy.gif"></div>
-      <div class="gallery-item"><img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTlydWRoc2ZhZGVwOTJ3Y2liZTZyNm9lbDduNHNxazNodzJkcjd3OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XIjZpzU7Dw2z1ZvyKp/giphy.gif"></div>
-      <div class="gallery-item"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHE5OWY2aW16MnFmcGY0bTFoMng2dXlyaTJ0c291NXFybGs1eHF2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jkZpBZljxIWIYlm0pH/giphy.gif"></div>
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>Join the Family</h2>
-    <p>Click below to enter the Çukur world</p>
-    <small class="owner-text">Server Owner KD /CEO OWNER Kaan_330</small>
-    <br>
-    <button onclick="window.open('https://discord.gg/zrMp8zwhCW')">Join Discord</button>
-    <button onclick="window.open('https://guns.lol/kd_kaan')">Guns.lol</button>
-  </div>
-
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="pre-title">ÇUKUR</div>
+  <div class="pre-bar"><div class="pre-bar-fill"></div></div>
+  <div class="pre-percent">LOADING... <span id="prePercent">0</span>%</div>
 </div>
 
-<div id="yt-player" style="display: none;"></div>
+<!-- ÇUKUR SYMBOL CURSOR -->
+<div class="cursor-cukur" id="cursorCukur">
+  <span class="cur-sym">ᑅ</span><span class="cur-dot">ᐧ</span><span class="cur-sym">ᑀ</span>
+</div>
 
-<div class="audio-player-container">
-  <span>Müzik</span>
-  <button class="play-btn" id="togglePlayBtn" onclick="togglePlayback()">LOADING...</button>
+<!-- TOP-LEFT: VIEW COUNTER -->
+<div class="top-left-stack">
+  <div class="counter-wrap" title="Total website views">
+    <span class="eye">👁️</span>
+    <span class="count" id="viewCount">0</span>
+    <span class="label">Views</span>
+  </div>
+</div>
+
+<!-- TOP-RIGHT: CREATOR CREDITS -->
+<div class="creator-tag">
+  <strong>Website created by KAAN DURAN</strong>
+  16 yo · a little knowledge of website creating
+  <small>Founder · Developer · Designer</small>
+  <a href="https://www.youtube.com/@KDservices-1" target="_blank" rel="noopener">▶ YouTube · @KDservices-1</a>
+</div>
+
+<!-- MUSIC GATE -->
+<div id="musicGate">
+  <div class="gate-emblem">🩸 ÇUKUR 🩸</div>
+  <div class="gate-title">MUSIC GATE</div>
+  <div class="gate-sub">Turn on the music to enter</div>
+  <div class="gate-player-wrap">
+    <div class="gate-live"><span class="live-dot"></span> LIVE</div>
+    <div class="gate-track-info" id="gateTrackInfo">🎵 Track 1 / 5</div>
+    <div class="gate-player-inner" id="gatePlayerInner"></div>
+  </div>
+  <button class="gate-unlock-btn" onclick="unlockWebsite()">🔊 TURN ON & UNLOCK</button>
+  <div class="gate-desc">Click the button to enter Çukur Café — the playlist starts and the website unlocks. Tracks switch automatically in a loop. Hover over any gallery section to switch music instantly.</div>
+  <div class="gate-hint">🔒 Locked · Music must be started first · Press M to pause · 5-track playlist · Hover sections to change songs</div>
+  <div class="mini-controls">
+    <div class="mini-title" id="miniTitle">🎵 Track 1 / 5</div>
+    <div class="mini-bars" id="miniBars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+    <button class="mini-btn" id="miniPrevBtn" onclick="prevTrack()" title="Previous (←)">⏮</button>
+    <button class="mini-btn" id="miniPlayBtn" onclick="togglePlayback()" title="Play/Pause (M)">❚❚</button>
+    <button class="mini-btn" id="miniNextBtn" onclick="nextTrack()" title="Next (→)">⏭</button>
+    <button class="mini-btn close" onclick="hidePlayer()" title="Hide">✕</button>
+  </div>
+</div>
+
+<div id="unlock-badge">✅ Website unlocked</div>
+<div id="adblock-shield">
+  <span class="dot"></span>
+  🛡️ ADBLOCK ACTIVE
+  <span class="blocked-count" id="blockedCount">0</span>
+</div>
+
+<!-- BACKGROUNDS -->
+<div class="bg"></div>
+<div class="bg-overlay"></div>
+<div class="scanlines"></div>
+<div class="rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+<canvas id="particles-canvas"></canvas>
+<div class="spotlight" id="spotlight"></div>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+
+  <h1><span class="glitch" data-text="🩸 ÇUKUR &lt;•••&gt; 🩸">🩸 ÇUKUR &lt;•••&gt; 🩸</span></h1>
+
+  <div class="section reveal">
+    <h2>Welcome to the Neighborhood</h2>
+    <p>Çukur is not a place. Çukur is a family. ❤️</p>
+    <p style="font-size:.88rem;color:#a89080;margin-top:10px">🩸 <em>Çukur bir yer değil. Çukur bir ailedir.</em> · <em>Çukur ist kein Ort. Çukur ist eine Familie.</em></p>
+  </div>
+
+  <!-- ABOUT ÇUKUR -->
+  <div class="section reveal">
+    <h2>📖 What is Çukur?</h2>
+    <p>New here? Çukur is a Turkish crime drama that aired on <strong style="color:#ff5555">Show TV</strong> from 2017 to 2021 — 4 seasons, 131 episodes. It tells the story of the <strong style="color:#ff5555">Koçovalı family</strong> and their control over Çukur ("The Pit"), a dangerous neighborhood in Istanbul's historic Balat district.</p>
+    <div class="about-grid">
+      <div class="about-card">
+        <span class="icon">🎬</span>
+        <h3>The Show</h3>
+        <p>A crime drama set in Istanbul, Turkey. Show TV, 2017–2021. Winner of multiple Turkish TV awards.</p>
+      </div>
+      <div class="about-card">
+        <span class="icon">👨‍👩‍👦</span>
+        <h3>The Family</h3>
+        <p>The Koçovalıs — İdris (father), and sons Cumali, Kahraman, Selim and Yamaç — rule the neighborhood with a strict code of honor.</p>
+      </div>
+      <div class="about-card">
+        <span class="icon">🚫</span>
+        <h3>The Rule</h3>
+        <p>Drugs are strictly forbidden in Çukur. Anyone who breaks this ban faces the family's wrath. That's the law of the Mahalle.</p>
+      </div>
+      <div class="about-card">
+        <span class="icon">🩸</span>
+        <h3>The Story</h3>
+        <p>When the family's control is threatened, youngest son Yamaç — a chemist who wanted nothing to do with the business — returns home and is forced to become the leader.</p>
+      </div>
+    </div>
+    <p class="about-credit">Sources: <a href="https://www.imdb.com/title/tt7431994/plotsummary/" target="_blank" rel="noopener">IMDb</a> · <a href="https://en.wikipedia.org/wiki/%C3%87ukur_(TV_series)" target="_blank" rel="noopener">Wikipedia</a> · <a href="https://www.showtv.com.tr/dizi/cukur" target="_blank" rel="noopener">Show TV</a></p>
+  </div>
+
+  <!-- SECTION: KARA KUZULAR — hover = track 0 (Karakuzular music) -->
+  <div class="section reveal" data-hover-track="0">
+    <h2>🖤 Kara Kuzular</h2>
+    <p>The feared gang of Çukur — Çeto, Mahsun and their crew. The black lambs of the Mahalle.</p>
+    <div class="gallery">
+      <div class="gallery-item reveal-scale"><img src="https://im.showtv.com.tr/2018/09/07/ver1536657762/2134303_1920x1080.jpg" alt="Kara Kuzular" loading="lazy"><span class="gallery-caption">KARA KUZULAR</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://im.showtv.com.tr/2018/09/07/2134303_8da23984365fec6c8f22918ae9017da7_640x640.jpg" alt="Karakuzular" loading="lazy"><span class="gallery-caption">KARAKUZULAR</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://resim.dizihaberci.com/wp-content/uploads/2018/12/cukur_kuzu.jpg" alt="Çukur Kuzu" loading="lazy"><span class="gallery-caption">ÇUKUR KUZU</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://mo.ciner.com.tr/video/2018/11/12/ver1726038663/525E509422FF80F69C3973395B529D0C.jpg" alt="Karakuzular Crew" loading="lazy"><span class="gallery-caption">KARAKUZULAR CREW</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION: YAMAÇ KOÇOVALI — hover = track 1 (Heyecanı Yok) -->
+  <div class="section reveal" data-hover-track="1">
+    <h2>🔪 Yamaç Koçovalı</h2>
+    <p>The youngest Koçovalı brother — chemist, protector, and the reluctant heart of the Mahalle.</p>
+    <div class="gallery">
+      <div class="gallery-item reveal-scale"><img src="https://www.aslininsureti.com/wp-content/uploads/2019/10/%C3%A7ukur-evimiz-Yama%C3%A7-Babam%C4%B1z-7-1280x720.jpg" alt="Yamaç Koçovalı" loading="lazy"><span class="gallery-caption">YAMAÇ KOÇOVALI</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media.giphy.com/media/xG2CBWtN10I0v3hMZx/giphy.gif" alt="Yamaç GIF" loading="lazy"><span class="gallery-caption">YAMAÇ · ÇUKUR</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media.giphy.com/media/ftew2Mf6Cr9LruR4aN/giphy.gif" alt="Kemal & Yamaç GIF" loading="lazy"><span class="gallery-caption">KEMAL & YAMAÇ</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION: ÇUKUR PICTURES — hover = track 2 (Kalbim Çukur'da) -->
+  <div class="section reveal" data-hover-track="2">
+    <h2>📸 Çukur Pictures</h2>
+    <div class="gallery">
+      <div class="gallery-item reveal-scale"><img src="https://i.pinimg.com/originals/f8/bf/ae/f8bfae1a713cc66e09d6e839156a59d2.png" alt="Çukur logo" loading="lazy"><span class="gallery-caption">ÇUKUR LOGO</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://w0.peakpx.com/wallpaper/44/396/HD-wallpaper-cukur-karakuzular-cukur-2019-cukur-pp-cukur-yeni-cukur.jpg" alt="Çukur Mahalle" loading="lazy"><span class="gallery-caption">ÇUKUR MAHALLE</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://m.media-amazon.com/images/M/MV5BYmIyZjkxMjgtOTFlNi00OWU2LTgyOGEtNzkyMTEyMjVmMDg3XkEyXkFqcGc@._V1_.jpg" alt="Çukur" loading="lazy"><span class="gallery-caption">KOÇOVALI</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5Bjxqx_SragE7jw-4Lgkaf_XcR70d65bdNn_QCMO_gk4dlEbux1kvQDY&s=10" alt="Çukur" loading="lazy"><span class="gallery-caption">MAHALLE</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://i.pinimg.com/236x/9b/25/a6/9b25a6131c968f71be1a4d3163d976d0.jpg" alt="Çukur" loading="lazy"><span class="gallery-caption">ÇUKUR</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION: ÇUKUR GIFS — hover = track 3 (Unutucak Günler) -->
+  <div class="section reveal" data-hover-track="3">
+    <h2>🎥 Çukur GIFS</h2>
+    <div class="gallery">
+      <div class="gallery-item reveal-scale"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExcHozYW05czQ2Mm1iZHI1dG1hZzJqem1sYWYwcGk4N3kwdHd6aGEyMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XgZ16eV5nfxyrpKXoN/giphy.gif" alt="Çukur GIF" loading="lazy"><span class="gallery-caption">YAMAÇ</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExYnRwaWJpdGZkaDJzYXN6dW91cHB4MzUyb3N0c3JuZDdicGJyNTExaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/ifLnmjGWXRZrFbgC3O/giphy.gif" alt="Çukur GIF" loading="lazy"><span class="gallery-caption">SHOW TV</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXVnZjVydnVzNHk1OGp5eWdpZWUwbXBpa2c0aWdvc2tnZ29saW14dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/VHr5pzILwOowEqsIz5/giphy.gif" alt="Çukur GIF" loading="lazy"><span class="gallery-caption">ÇUKUR</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTF3dHM4YnlnMzg1Y3AzY3Y4YmpvemVkaGUzdXZydnJhcnpzMTBndyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gw7XNxnRR9PXLFjau4/giphy.gif" alt="Çukur GIF" loading="lazy"><span class="gallery-caption">MAHALLE</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMTlydWRoc2ZhZGVwOTJ3Y2liZTZyNm9lbDduNHNxazNodzJkcjd3OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XIjZpzU7Dw2z1ZvyKp/giphy.gif" alt="Çukur GIF" loading="lazy"><span class="gallery-caption">KOÇOVALI</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHE5OWY2aW16MnFmcGY0bTFoMng2dXlyaTJ0c291NXFybGs1eHF2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jkZpBZljxIWIYlm0pH/giphy.gif" alt="Çukur GIF" loading="lazy"><span class="gallery-caption">ÇUKUR DIZI</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://media.giphy.com/media/fvrNuox07MnnKXwzCr/giphy.gif" alt="Show TV Çukur GIF" loading="lazy"><span class="gallery-caption">SHOW TV · ÇUKUR</span></div>
+    </div>
+  </div>
+
+  <!-- SECTION: ERDENET — hover = track 4 (Erdenet music) -->
+  <div class="section reveal" data-hover-track="4">
+    <h2>🐺 Erdenet</h2>
+    <p>The wild wolf of Çukur — Erdenet, the fearless fighter with a heart of stone and loyalty to the Mahalle.</p>
+    <div class="gallery">
+      <div class="gallery-item reveal-scale"><img src="https://i.ytimg.com/vi/J72OnWbWZso/maxresdefault.jpg" alt="Erdenet" loading="lazy"><span class="gallery-caption">ERDENET</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://static.wikia.nocookie.net/cukur/images/5/5b/Ar%C4%B1k_B%C3%B6ke_Erdenet2.jpg/revision/latest?cb=20210614160932" alt="Erdenet Arık Böke" loading="lazy"><span class="gallery-caption">ARIK BÖKE · ERDENET</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://i1.sndcdn.com/artworks-VS7ebJQ36gk6PmOx-bKToMQ-t500x500.jpg" alt="Erdenet Art" loading="lazy"><span class="gallery-caption">ERDENET · OST</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://img-s1.onedio.com/id-5e6fd36aa9c6e2811783f360/rev-0/w-600/h-412/f-jpg/s-040f35a3bebbbc883b1e09248f91bd2d13816852.jpg" alt="Erdenet Scenes" loading="lazy"><span class="gallery-caption">ERDENET SCENES</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQRJf4ukSHFzR48BWaL2N-ZNOveUdb4Z3TLZiAfBylezbQ88IS_p92m3AM&s=10" alt="Erdenet Portrait" loading="lazy"><span class="gallery-caption">ERDENET · PORTRAIT</span></div>
+      <div class="gallery-item reveal-scale"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT497SUT6XZIGOpAJaclojUZTxr0p_KWCVShwNzdeQd9kfTOyM9RGHN_xs&s=10" alt="Erdenet Moment" loading="lazy"><span class="gallery-caption">ERDENET · MOMENT</span></div>
+    </div>
+  </div>
+
+  <div class="section reveal">
+    <h2>Join the Family</h2>
+    <p>Click below to enter the Çukur world</p>
+    <small class="owner-text">Server Owner KD / CEO OWNER Kaan_330</small>
+    <br>
+    <button onclick="window.open('https://discord.gg/zrMp8zwhCW','_blank')">Join Discord</button>
+    <button onclick="window.open('https://guns.lol/kd_kaan','_blank')">Guns.lol</button>
+    <button onclick="window.open('https://www.youtube.com/@KDservices-1','_blank')">▶ YouTube · @KDservices-1</button>
+  </div>
+
 </div>
 
 <script>
-  // Load the YouTube API framework asynchronously
+// ================== PRELOADER ==================
+(function(){
+  var pct = 0;
+  var el = document.getElementById('prePercent');
+  var iv = setInterval(function(){
+    pct += Math.random() * 12 + 4;
+    if (pct >= 100){ pct = 100; clearInterval(iv); setTimeout(function(){
+      document.getElementById('preloader').classList.add('done');
+    }, 400); }
+    if (el) el.textContent = Math.floor(pct);
+  }, 120);
+})();
+
+// ================== SCROLL PROGRESS BAR ==================
+(function(){
+  var bar = document.getElementById('scroll-progress');
+  function update(){
+    var h = document.documentElement;
+    var scrolled = (h.scrollTop || document.body.scrollTop);
+    var max = (h.scrollHeight || document.body.scrollHeight) - h.clientHeight;
+    var pct = max > 0 ? (scrolled / max) * 100 : 0;
+    if (bar) bar.style.width = pct + '%';
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+
+// ================== ÇUKUR SYMBOL CURSOR ==================
+(function(){
+  if (window.matchMedia('(hover:none)').matches) return;
+  var reticle = document.getElementById('cursorCukur');
+  if (!reticle) return;
+
+  var mx = 0, my = 0;
+  var rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', function(e){
+    mx = e.clientX; my = e.clientY;
+  });
+
+  function raf(){
+    rx += (mx - rx) * 0.24;
+    ry += (my - ry) * 0.24;
+    reticle.style.left = rx + 'px';
+    reticle.style.top = ry + 'px';
+    requestAnimationFrame(raf);
+  }
+  raf();
+
+  // Blood-drop trail
+  var lastDrop = 0;
+  document.addEventListener('mousemove', function(e){
+    var now = Date.now();
+    if (now - lastDrop < 50) return;
+    lastDrop = now;
+    var drop = document.createElement('div');
+    drop.className = 'cursor-drop';
+    var jitterX = (Math.random() - 0.5) * 16;
+    var jitterY = (Math.random() - 0.5) * 16;
+    drop.style.left = (e.clientX + jitterX) + 'px';
+    drop.style.top = (e.clientY + jitterY) + 'px';
+    drop.style.transition = 'transform 0.75s ease-out, opacity 0.75s ease-out';
+    document.body.appendChild(drop);
+    requestAnimationFrame(function(){
+      drop.style.transform = 'translate(-50%, ' + (16 + Math.random() * 24) + 'px) scale(0.25)';
+      drop.style.opacity = '0';
+    });
+    setTimeout(function(){ drop.remove(); }, 800);
+  });
+
+  // Hover detection
+  var hoverTargets = 'a,button,.gallery-item,.section,input,textarea,.mini-btn,.about-card,select';
+  document.addEventListener('mouseover', function(e){
+    if (e.target.closest && e.target.closest(hoverTargets)) reticle.classList.add('hover');
+  });
+  document.addEventListener('mouseout', function(e){
+    if (e.target.closest && e.target.closest(hoverTargets)) reticle.classList.remove('hover');
+  });
+  document.addEventListener('mousedown', function(){ reticle.classList.add('click'); });
+  document.addEventListener('mouseup', function(){ reticle.classList.remove('click'); });
+})();
+
+// ================== RIPPLE ==================
+document.addEventListener('click', function(e){
+  var r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = e.clientX + 'px';
+  r.style.top = e.clientY + 'px';
+  r.style.width = '100px';
+  r.style.height = '100px';
+  document.body.appendChild(r);
+  setTimeout(function(){ r.remove(); }, 700);
+});
+
+// ================== VIEW COUNTER (SAFE + PERSISTENT) ==================
+(function viewCounter(){
+  var STORAGE_KEY = 'cukur_total_views';
+  var SESSION_KEY = 'cukur_session_counted';
+  var total = 0;
+  try {
+    total = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10) || 0;
+    if (!sessionStorage.getItem(SESSION_KEY)) {
+      total += 1;
+      localStorage.setItem(STORAGE_KEY, String(total));
+      sessionStorage.setItem(SESSION_KEY, '1');
+    }
+  } catch(e){
+    total = 1;
+  }
+  var el = document.getElementById('viewCount');
+  if (el){
+    el.textContent = total.toLocaleString('en-US');
+    setTimeout(function(){ el.classList.add('bump'); }, 800);
+    setTimeout(function(){ el.classList.remove('bump'); }, 1400);
+  }
+  window.addEventListener('storage', function(ev){
+    if (ev.key === STORAGE_KEY && el){
+      var v = parseInt(ev.newValue || '0', 10) || 0;
+      el.textContent = v.toLocaleString('en-US');
+      el.classList.add('bump');
+      setTimeout(function(){ el.classList.remove('bump'); }, 500);
+    }
+  });
+})();
+
+// ================== MUSIC GATE + PLAYLIST ==================
+// Track map (FIXED — Karakuzular & Kalbim Çukur'da now correctly paired):
+//   0 → jP_Look_xqA  · Karakuzular
+//   1 → 4H6jfchhthg  · Heyecanı Yok
+//   2 → MqmLjTdskKg  · Kalbim Çukur'da
+//   3 → DQUXnIQy1NI  · Unutucak Günler
+//   4 → FSubizG1vs0  · Erdenet
+// Loops back to 0 after 4 ends.
+var PLAYLIST = [
+  { id: 'jP_Look_xqA', title: 'Karakuzular' },
+  { id: '4H6jfchhthg', title: 'Heyecanı Yok' },
+  { id: 'MqmLjTdskKg', title: 'Kalbim Çukur\'da' },
+  { id: 'DQUXnIQy1NI', title: 'Unutucak Günler' },
+  { id: 'FSubizG1vs0', title: 'Erdenet' }
+];
+var currentTrack = 0;
+var videoFrame = null;
+var musicPlaying = true;
+var unlocked = false;
+var ytPlayer = null;
+var ytReady = false;
+
+// Hover state
+var isHoverTrack = false;
+var hoveredSectionEl = null;
+var resumeTrackIdx = null;
+
+function fmtTrack(){
+  return '🎵 ' + (currentTrack + 1) + ' / ' + PLAYLIST.length + ' · ' + PLAYLIST[currentTrack].title;
+}
+function updateTrackLabels(){
+  var t = fmtTrack();
+  var gt = document.getElementById('gateTrackInfo');
+  var mt = document.getElementById('miniTitle');
+  if (gt) gt.textContent = t;
+  if (mt) mt.textContent = t;
+}
+
+// Build the initial YouTube iframe (autoplay muted so browsers allow it)
+(function injectGateVideo(){
+  var inner = document.getElementById('gatePlayerInner');
+  if (!inner) return;
+  var iframe = document.createElement('iframe');
+  iframe.id = 'ytVideoFrame';
+  iframe.setAttribute('width', '100%');
+  iframe.setAttribute('height', '100%');
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('playsinline', '');
+  iframe.src = 'https://www.youtube.com/embed/' + PLAYLIST[currentTrack].id +
+    '?autoplay=1&mute=1&loop=0&playlist=' + PLAYLIST[currentTrack].id +
+    '&controls=0&modestbranding=1&rel=0&playsinline=1' +
+    '&enablejsapi=1&origin=' + encodeURIComponent(location.origin) +
+    '&iv_load_policy=3&fs=0&color=white';
+  inner.appendChild(iframe);
+  videoFrame = iframe;
+  updateTrackLabels();
+})();
+
+// YT API for end-detection
+(function loadYTAPI(){
   var tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  tag.src = 'https://www.youtube.com/iframe_api';
+  var first = document.getElementsByTagName('script')[0];
+  first.parentNode.insertBefore(tag, first);
+})();
 
-  var player;
-  var hasInteracted = false;
-
-  function onYouTubeIframeAPIReady() {
-    player = new YT.Player('yt-player', {
-      height: '0',
-      width: '0',
-      videoId: '_Iq_uEZuqGg',
-      playerVars: {
-        'autoplay': 1,
-        'loop': 1,
-        'playlist': '_Iq_uEZuqGg',
-        'controls': 0
-      },
-      events: {
-        'onReady': onPlayerReady
+function onYouTubeIframeAPIReady(){
+  ytPlayer = new YT.Player('ytVideoFrame', {
+    events: {
+      'onReady': function(){ ytReady = true; },
+      'onStateChange': function(e){
+        if (e.data === 0){
+          if (!isHoverTrack){
+            nextTrack(true);
+          }
+        }
       }
+    }
+  });
+}
+
+function sendYT(func, args){
+  if (!videoFrame || !videoFrame.contentWindow) return;
+  try {
+    videoFrame.contentWindow.postMessage(
+      JSON.stringify({event:'command', func:func, args:args || []}), '*'
+    );
+  } catch(e){}
+}
+
+// Core loader
+function loadTrack(index, keepPlaying, loop){
+  currentTrack = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
+  var id = PLAYLIST[currentTrack].id;
+  updateTrackLabels();
+  var inner = document.getElementById('gatePlayerInner');
+  if (!inner) return;
+  inner.innerHTML = '';
+  var iframe = document.createElement('iframe');
+  iframe.id = 'ytVideoFrame';
+  iframe.setAttribute('width', '100%');
+  iframe.setAttribute('height', '100%');
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.setAttribute('playsinline', '');
+  var loopParam = loop ? '1' : '0';
+  iframe.src = 'https://www.youtube.com/embed/' + id +
+    '?autoplay=1' + (keepPlaying ? '' : '&mute=0') +
+    '&mute=' + (keepPlaying ? '0' : '1') +
+    '&loop=' + loopParam + '&playlist=' + id +
+    '&controls=0&modestbranding=1&rel=0&playsinline=1' +
+    '&enablejsapi=1&origin=' + encodeURIComponent(location.origin) +
+    '&iv_load_policy=3&fs=0&color=white';
+  inner.appendChild(iframe);
+  videoFrame = iframe;
+  if (typeof YT !== 'undefined' && YT.Player){
+    try {
+      ytPlayer = new YT.Player('ytVideoFrame', {
+        events: {
+          'onReady': function(){ ytReady = true; },
+          'onStateChange': function(e){
+            if (e.data === 0 && !isHoverTrack) nextTrack(true);
+          }
+        }
+      });
+    } catch(e){}
+  }
+  musicPlaying = true;
+  updateMiniUI();
+}
+
+function nextTrack(auto){
+  if (isHoverTrack) return;
+  loadTrack(currentTrack + 1, unlocked || auto, false);
+}
+function prevTrack(){
+  isHoverTrack = false;
+  loadTrack(currentTrack - 1, unlocked, false);
+}
+
+// ================== HOVER → SWITCH MUSIC ==================
+(function setupHoverMusic(){
+  function handleOver(e){
+    if (!unlocked) return;
+    var sec = e.target.closest ? e.target.closest('.section[data-hover-track]') : null;
+
+    if (sec === hoveredSectionEl) return;
+
+    if (sec){
+      if (!hoveredSectionEl){
+        resumeTrackIdx = currentTrack;
+      }
+      hoveredSectionEl = sec;
+      isHoverTrack = true;
+      var idx = parseInt(sec.getAttribute('data-hover-track'), 10);
+      if (isNaN(idx)) return;
+      if (currentTrack !== idx){
+        loadTrack(idx, true, true);
+      }
+    } else {
+      if (hoveredSectionEl){
+        hoveredSectionEl = null;
+        isHoverTrack = false;
+        if (resumeTrackIdx !== null){
+          var resume = resumeTrackIdx;
+          resumeTrackIdx = null;
+          loadTrack(resume, true, false);
+        }
+      }
+    }
+  }
+
+  document.addEventListener('mouseover', handleOver, true);
+
+  document.addEventListener('mouseleave', function(){
+    if (hoveredSectionEl){
+      hoveredSectionEl = null;
+      isHoverTrack = false;
+      if (resumeTrackIdx !== null){
+        var resume = resumeTrackIdx;
+        resumeTrackIdx = null;
+        loadTrack(resume, true, false);
+      }
+    }
+  });
+})();
+
+function launchConfetti(){
+  var colors = ['#ff1e1e','#8b0000','#ff5555','#ffffff','#ff3333'];
+  for (var i = 0; i < 90; i++){
+    (function(i){
+      setTimeout(function(){
+        var c = document.createElement('div');
+        c.className = 'confetti-piece';
+        c.style.left = Math.random() * 100 + 'vw';
+        c.style.background = colors[Math.floor(Math.random() * colors.length)];
+        c.style.animationDuration = (2 + Math.random() * 2) + 's';
+        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        c.style.width = (6 + Math.random() * 10) + 'px';
+        c.style.height = (6 + Math.random() * 10) + 'px';
+        document.body.appendChild(c);
+        setTimeout(function(){ c.remove(); }, 4500);
+      }, i * 18);
+    })(i);
+  }
+}
+
+function unlockWebsite(){
+  if (unlocked) return;
+  unlocked = true;
+  sendYT('unMute', []);
+  sendYT('setVolume', [80]);
+  sendYT('playVideo', []);
+  if (ytPlayer && ytPlayer.unMute){ try { ytPlayer.unMute(); ytPlayer.setVolume(80); ytPlayer.playVideo(); } catch(e){} }
+  document.body.classList.remove('locked');
+  var gate = document.getElementById('musicGate');
+  gate.classList.add('minimized');
+  musicPlaying = true;
+  updateMiniUI();
+  var badge = document.getElementById('unlock-badge');
+  badge.classList.add('active');
+  setTimeout(function(){ badge.classList.remove('active'); }, 4000);
+  launchConfetti();
+  console.log('%c🔓 Çukur Café unlocked · Playlist running', 'color:#2ecc71;font-weight:900;font-size:14px');
+}
+
+function togglePlayback(){
+  if (musicPlaying){
+    sendYT('pauseVideo', []);
+    if (ytPlayer && ytPlayer.pauseVideo){ try { ytPlayer.pauseVideo(); } catch(e){} }
+    musicPlaying = false;
+  } else {
+    sendYT('playVideo', []);
+    if (ytPlayer && ytPlayer.playVideo){ try { ytPlayer.playVideo(); } catch(e){} }
+    musicPlaying = true;
+  }
+  updateMiniUI();
+}
+
+function updateMiniUI(){
+  var btn = document.getElementById('miniPlayBtn');
+  var bars = document.getElementById('miniBars');
+  if (!btn || !bars) return;
+  if (musicPlaying){ btn.textContent = '❚❚'; bars.classList.remove('paused'); }
+  else { btn.textContent = '▶'; bars.classList.add('paused'); }
+}
+
+function hidePlayer(){
+  var gate = document.getElementById('musicGate');
+  gate.style.transform = 'translateY(200%) scale(0)';
+  gate.style.opacity = '0';
+  gate.style.pointerEvents = 'none';
+  musicPlaying = false;
+  sendYT('pauseVideo', []);
+  if (ytPlayer && ytPlayer.pauseVideo){ try { ytPlayer.pauseVideo(); } catch(e){} }
+  updateMiniUI();
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e){
+  if (!unlocked) return;
+  if (e.key === 'm' || e.key === 'M') togglePlayback();
+  if (e.key === 'ArrowRight'){ isHoverTrack = false; hoveredSectionEl = null; nextTrack(); }
+  if (e.key === 'ArrowLeft'){ isHoverTrack = false; hoveredSectionEl = null; prevTrack(); }
+});
+
+// ================== SCROLL REVEAL ==================
+var revealObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+function observeReveals(){
+  document.querySelectorAll('.reveal, .reveal-scale').forEach(function(el){
+    revealObserver.observe(el);
+  });
+}
+observeReveals();
+
+// ================== SPOTLIGHT + SECTION CURSOR TRACK ==================
+var spotlight = document.getElementById('spotlight');
+document.addEventListener('mousemove', function(e){
+  if (spotlight){
+    spotlight.style.left = e.clientX + 'px';
+    spotlight.style.top = e.clientY + 'px';
+  }
+  document.querySelectorAll('.section').forEach(function(s){
+    var r = s.getBoundingClientRect();
+    if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom){
+      s.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+      s.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    }
+  });
+});
+
+// ================== PARTICLES ==================
+var canvas = document.getElementById('particles-canvas');
+var ctx = canvas.getContext('2d');
+var particlesArray = [];
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', function(){
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  initParticles();
+});
+function Particle(){
+  this.x = Math.random() * canvas.width;
+  this.y = Math.random() * canvas.height;
+  this.size = Math.random() * 2.5 + 0.5;
+  this.speedX = Math.random() * 1 - 0.5;
+  this.speedY = Math.random() * 1 - 0.5;
+  this.opacity = Math.random() * 0.6 + 0.15;
+  this.isBright = Math.random() > 0.5;
+}
+Particle.prototype.update = function(){
+  this.x += this.speedX; this.y += this.speedY;
+  if (this.x > canvas.width) this.x = 0;
+  if (this.x < 0) this.x = canvas.width;
+  if (this.y > canvas.height) this.y = 0;
+  if (this.y < 0) this.y = canvas.height;
+};
+Particle.prototype.draw = function(){
+  ctx.fillStyle = this.isBright ? 'rgba(255,80,80,' + this.opacity + ')' : 'rgba(180,20,20,' + this.opacity + ')';
+  ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+};
+function initParticles(){
+  particlesArray = [];
+  var density = window.innerWidth < 700 ? 22000 : 11000;
+  var n = (canvas.width * canvas.height) / density;
+  for (var i = 0; i < n; i++) particlesArray.push(new Particle());
+}
+function connectParticles(){
+  var maxDist = 120;
+  for (var a = 0; a < particlesArray.length; a++){
+    for (var b = a + 1; b < particlesArray.length; b++){
+      var dx = particlesArray[a].x - particlesArray[b].x;
+      var dy = particlesArray[a].y - particlesArray[b].y;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < maxDist){
+        var alpha = (1 - dist/maxDist) * 0.14;
+        ctx.strokeStyle = 'rgba(255,50,50,' + alpha + ')';
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+function animateParticles(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particlesArray.forEach(function(p){ p.update(); p.draw(); });
+  if (window.innerWidth > 700) connectParticles();
+  requestAnimationFrame(animateParticles);
+}
+initParticles(); animateParticles();
+
+// ================== FLOATING EMOJI ==================
+var floatEmojis = ['🩸','🔪','⚔️','🗡️','🚬','🥃','🖤','❤️‍🔥','🐺'];
+for (var i = 0; i < 12; i++){
+  var el = document.createElement('div');
+  el.className = 'float-emoji';
+  el.textContent = floatEmojis[Math.floor(Math.random() * floatEmojis.length)];
+  el.style.left = Math.random() * 100 + 'vw';
+  el.style.animationDuration = (15 + Math.random() * 15) + 's';
+  el.style.animationDelay = (Math.random() * 20) + 's';
+  el.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+  document.body.appendChild(el);
+}
+
+// ================== ADBLOCK ==================
+var blockedAdsCount = 0;
+(function(){
+  try {
+    var _open = window.open;
+    window.open = function(url){
+      if (!url) return null;
+      var ads = ['doubleclick','googlesyndication','googleadservices','adsystem','adservice','popads','popcash','propeller','onclick','trafficjunky','popunder','adf.ly','shortlink'];
+      if (ads.some(function(w){ return String(url).toLowerCase().indexOf(w) !== -1; })){
+        bumpBlocked();
+        return null;
+      }
+      return _open.apply(this, arguments);
+    };
+  } catch(e){}
+
+  function bumpBlocked(){
+    blockedAdsCount++;
+    var el = document.getElementById('blockedCount');
+    if (el){
+      el.textContent = blockedAdsCount;
+      el.classList.add('bump');
+      setTimeout(function(){ el.classList.remove('bump'); }, 600);
+    }
+  }
+  function cleanAds(){
+    var sel = [
+      'iframe[src*="doubleclick"]','iframe[src*="googlesyndication"]',
+      'iframe[src*="googleadservices"]','iframe[src*="adsystem"]',
+      'iframe[src*="adservice"]','iframe[src*="popads"]',
+      'iframe[src*="popcash"]','iframe[src*="propeller"]',
+      '.adsbygoogle','[data-ad-slot]','[data-ad-client]',
+      '[id^="google_ads_"]','.advertisement','.ad-container',
+      '.ads-container','.sponsored','[aria-label="Advertisement"]'
+    ];
+    sel.forEach(function(s){
+      document.querySelectorAll(s).forEach(function(el){
+        if (el.id === 'ytVideoFrame') return;
+        if (el.closest && el.closest('.gate-player-wrap')) return;
+        el.style.display = 'none';
+        el.style.height = '0';
+        el.style.width = '0';
+        el.setAttribute('aria-hidden', 'true');
+        bumpBlocked();
+      });
     });
   }
+  window.addEventListener('load', function(){
+    setTimeout(cleanAds, 800);
+    setInterval(cleanAds, 4000);
+  });
+})();
 
-  function onPlayerReady(event) {
-    // Attempt instant unmuted playback right out of the gate
-    player.unMute();
-    player.setVolume(100);
-    player.playVideo();
-    
-    // Check if the browser allowed immediate sound or blocked it
-    setTimeout(() => {
-      if (player.getPlayerState() === 1) { // 1 means Playing
-        document.getElementById('togglePlayBtn').innerText = "PAUSE";
-        hasInteracted = true;
-      } else {
-        document.getElementById('togglePlayBtn').innerText = "TAP TO PLAY";
-      }
-    }, 1000);
-  }
+// ================== INIT ==================
+window.addEventListener('load', function(){
+  updateMiniUI();
+  updateTrackLabels();
+});
 
-  // Fallback sound trigger: plays instantly upon any touch, click, or scroll movement
-  const soundBypass = () => {
-    if (!hasInteracted && player && typeof player.unMute === 'function') {
-      player.unMute();
-      player.setVolume(100);
-      player.playVideo();
-      document.getElementById('togglePlayBtn').innerText = "PAUSE";
-      hasInteracted = true;
-      
-      window.removeEventListener('click', soundBypass);
-      window.removeEventListener('touchstart', soundBypass);
-      window.removeEventListener('scroll', soundBypass);
-    }
-  };
-
-  window.addEventListener('click', soundBypass);
-  window.addEventListener('touchstart', soundBypass);
-  window.addEventListener('scroll', soundBypass);
-
-  // Manual Control Panel Button
-  function togglePlayback() {
-    if (!player || typeof player.getPlayerState !== 'function') return;
-    
-    var state = player.getPlayerState();
-    var btn = document.getElementById('togglePlayBtn');
-    
-    if (state === 1) {
-      player.pauseVideo();
-      btn.innerText = "PLAY";
-    } else {
-      player.unMute();
-      player.setVolume(100);
-      player.playVideo();
-      btn.innerText = "PAUSE";
-      hasInteracted = true;
-    }
-  }
+console.log('%c🩸 ÇUKUR CAFÉ 🩸',
+  'background:linear-gradient(135deg,#ff1e1e,#8b0000);color:#fff;font-size:18px;padding:14px 24px;border-radius:8px;font-weight:900;letter-spacing:3px;font-family:Cinzel,serif');
+console.log('%c🎵 5-track playlist · 🖱️ Hover sections to switch music · 👁️ View counter · 🛡️ Adblock · ✨ Çukur symbol cursor · 📺 @KDservices-1','color:#ff5555;font-size:13px;padding:5px');
 </script>
-
 </body>
 </html>
-
-<script defer data-domain="html.cafe" src="https://milkymouse.com/js/script.js"></script>
-
-   
