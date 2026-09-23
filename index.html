@@ -103,9 +103,9 @@ a,button,.gallery-item,.section,.mini-btn,select,input,textarea,.sp-btn{touch-ac
 .gate-player-wrap::before{content:'';position:absolute;inset:-3px;border-radius:24px;background:conic-gradient(from 0deg,#ff1e1e,#8b0000,#ff5555,#ff1e1e);animation:borderRotate 5s linear infinite;z-index:-1}
 @keyframes borderRotate{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-/* Hidden YouTube audio backend */
+/* Hidden audio backend */
 #gatePlayerInner{position:fixed;bottom:0;right:0;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;z-index:-1}
-#gatePlayerInner iframe{width:1px;height:1px;border:0}
+#gatePlayerInner audio{width:1px;height:1px}
 
 .sp-player{padding:22px 20px 20px;display:flex;flex-direction:column;gap:16px;position:relative;z-index:2}
 .sp-cover-wrap{position:relative;width:100%;aspect-ratio:1/1;max-width:260px;margin:0 auto;border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.9),0 0 60px rgba(255,30,30,.35);border:2px solid rgba(255,30,30,.5)}
@@ -394,11 +394,13 @@ button:not(.mini-btn):not(.play-btn):not(.sp-btn):not(.gate-unlock-btn):active{t
       </div>
       <div class="sp-controls">
         <button class="sp-btn" onclick="prevTrack()" title="Previous">⏮</button>
-        <button class="sp-btn sp-play" id="spPlay" onclick="togglePlayback()" title="Play/Pause">❚❚</button>
+        <button class="sp-btn sp-play" id="spPlay" onclick="togglePlayback()" title="Play/Pause">▶</button>
         <button class="sp-btn" onclick="nextTrack()" title="Next">⏭</button>
       </div>
     </div>
-    <div id="gatePlayerInner"></div>
+    <div id="gatePlayerInner">
+      <audio id="cukurAudio" preload="auto"></audio>
+    </div>
   </div>
 
   <button class="gate-unlock-btn" onclick="unlockWebsite()">🔊 TURN ON & UNLOCK</button>
@@ -413,7 +415,7 @@ button:not(.mini-btn):not(.play-btn):not(.sp-btn):not(.gate-unlock-btn):active{t
     </div>
     <div class="mini-bars" id="miniBars"><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
     <button class="mini-btn" onclick="prevTrack()" title="Previous">⏮</button>
-    <button class="mini-btn" id="miniPlayBtn" onclick="togglePlayback()" title="Play/Pause">❚❚</button>
+    <button class="mini-btn" id="miniPlayBtn" onclick="togglePlayback()" title="Play/Pause">▶</button>
     <button class="mini-btn" onclick="nextTrack()" title="Next">⏭</button>
     <button class="mini-btn close" onclick="hidePlayer()" title="Hide">✕</button>
   </div>
@@ -660,26 +662,80 @@ document.addEventListener('click', function(e){
   });
 })();
 
-// ================== PLAYLIST ==================
+// ================== AUDIO PLAYER (AD-FREE · CORRECT FILE → SECTION MAPPING) ==================
+// ✅ From your tests:
+//   kj1pmz.mp4 = Karakuzular
+//   gozsg0.mp4 = Unutulacak Günler
+//   9hxps3.mp4 = Erdenet
+//   wavn95.mp4 = Heyecanı Yok
+//   lhpkyw.mp4 = Kalbim Çukur'da
 var PLAYLIST = [
-  { id: 'jP_Look_xqA', title: 'Karakuzular', artist: 'Çukur OST', cover: 'https://im.showtv.com.tr/2018/09/07/ver1536657762/2134303_1920x1080.jpg' },
-  { id: '4H6jfchhthg', title: 'Heyecanı Yok', artist: 'Çukur OST', cover: 'https://www.aslininsureti.com/wp-content/uploads/2019/10/%C3%A7ukur-evimiz-Yama%C3%A7-Babam%C4%B1z-7-1280x720.jpg' },
-  { id: 'MqmLjTdskKg', title: "Kalbim Çukur'da", artist: 'Çukur OST', cover: 'https://i.pinimg.com/originals/f8/bf/ae/f8bfae1a713cc66e09d6e839156a59d2.png' },
-  { id: 'DQUXnIQy1NI', title: 'Unutucak Günler', artist: 'Çukur OST', cover: 'https://w0.peakpx.com/wallpaper/44/396/HD-wallpaper-cukur-karakuzular-cukur-2019-cukur-pp-cukur-yeni-cukur.jpg' },
-  { id: 'FSubizG1vs0', title: 'Erdenet', artist: 'Çukur OST', cover: 'https://i.ytimg.com/vi/J72OnWbWZso/maxresdefault.jpg' }
+  { title: 'Karakuzular',       artist: 'Çukur OST', cover: 'https://im.showtv.com.tr/2018/09/07/ver1536657762/2134303_1920x1080.jpg', src: 'https://files.catbox.moe/kj1pmz.mp4' },  // index 0 → Kara Kuzular
+  { title: 'Heyecanı Yok',      artist: 'Çukur OST', cover: 'https://www.aslininsureti.com/wp-content/uploads/2019/10/%C3%A7ukur-evimiz-Yama%C3%A7-Babam%C4%B1z-7-1280x720.jpg', src: 'https://files.catbox.moe/wavn95.mp4' },  // index 1 → Yamaç
+  { title: "Kalbim Çukur'da",   artist: 'Çukur OST', cover: 'https://i.pinimg.com/originals/f8/bf/ae/f8bfae1a713cc66e09d6e839156a59d2.png', src: 'https://files.catbox.moe/lhpkyw.mp4' },  // index 2 → Pictures
+  { title: 'Unutucak Günler',   artist: 'Çukur OST', cover: 'https://w0.peakpx.com/wallpaper/44/396/HD-wallpaper-cukur-karakuzular-cukur-2019-cukur-pp-cukur-yeni-cukur.jpg', src: 'https://files.catbox.moe/gozsg0.mp4' },  // index 3 → Çukur GIFS
+  { title: 'Erdenet',           artist: 'Çukur OST', cover: 'https://i.ytimg.com/vi/J72OnWbWZso/maxresdefault.jpg', src: 'https://files.catbox.moe/9hxps3.mp4' }   // index 4 → Erdenet
 ];
 
-var currentTrack = 0;
-var videoFrame = null;
-var musicPlaying = true;
+var currentTrack = 0;      // ✅ Starts on Karakuzular
+var musicPlaying = false;
 var unlocked = false;
-var ytPlayer = null;
-var ytReady = false;
 var isHoverTrack = false;
 var hoveredSectionEl = null;
 var resumeTrackIdx = null;
-var progressInterval = null;
 
+var audio = document.getElementById('cukurAudio');
+var playBtn = document.getElementById('spPlay');
+
+// ✅ Preload Karakuzular immediately on page load
+if (audio){
+  audio.volume = 0.8;
+  audio.src = PLAYLIST[0].src;
+  audio.load();
+}
+
+if (playBtn) {
+  playBtn.addEventListener('click', function(){
+    togglePlayback();
+  });
+}
+
+function formatTime(sec){
+  sec = Math.floor(sec || 0);
+  var m = Math.floor(sec / 60);
+  var s = sec % 60;
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+if (audio) {
+  audio.addEventListener('timeupdate', function(){
+    if (!isNaN(audio.duration) && audio.duration > 0){
+      var percent = (audio.currentTime / audio.duration) * 100;
+      var f = document.getElementById('spFill');
+      if (f) f.style.width = percent + '%';
+      var c = document.getElementById('spTimeCur');
+      if (c) c.textContent = formatTime(audio.currentTime);
+      var d = document.getElementById('spTimeDur');
+      if (d) d.textContent = formatTime(audio.duration);
+    }
+  });
+
+  audio.addEventListener('ended', function(){
+    if (!isHoverTrack) nextTrack();
+  });
+
+  audio.addEventListener('play', function(){
+    musicPlaying = true;
+    updateMiniUI();
+  });
+
+  audio.addEventListener('pause', function(){
+    musicPlaying = false;
+    updateMiniUI();
+  });
+}
+
+// ================== TRACK LABELS ==================
 function updateTrackLabels(){
   var t = PLAYLIST[currentTrack];
   if (!t) return;
@@ -697,134 +753,63 @@ function updateTrackLabels(){
   if (sc) sc.src = t.cover;
 }
 
-function formatTime(sec){
-  sec = Math.floor(sec || 0);
-  var m = Math.floor(sec / 60);
-  var s = sec % 60;
-  return m + ':' + (s < 10 ? '0' : '') + s;
+// ================== MINI UI ==================
+function updateMiniUI(){
+  var btn  = document.getElementById('miniPlayBtn');
+  var sp   = document.getElementById('spPlay');
+  var bars = document.getElementById('miniBars');
+  if (musicPlaying){
+    if (btn) btn.textContent = '❚❚';
+    if (sp)  sp.textContent  = '❚❚';
+    if (bars) bars.classList.remove('paused');
+  } else {
+    if (btn) btn.textContent = '▶';
+    if (sp)  sp.textContent  = '▶';
+    if (bars) bars.classList.add('paused');
+  }
 }
 
-function buildIframe(id, mute, loop, autoplay){
-  var iframe = document.createElement('iframe');
-  iframe.id = 'ytVideoFrame';
-  iframe.setAttribute('frameborder', '0');
-  iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture; fullscreen');
-  iframe.setAttribute('allowfullscreen', '');
-  iframe.setAttribute('playsinline', '');
-  iframe.src = 'https://www.youtube.com/embed/' + id +
-    '?autoplay=' + (autoplay ? '1' : '0') +
-    '&mute=' + (mute ? '1' : '0') +
-    '&loop=' + (loop ? '1' : '0') +
-    '&playlist=' + id +
-    '&controls=0&modestbranding=1&rel=0&playsinline=1' +
-    '&enablejsapi=1&origin=' + encodeURIComponent(location.origin) +
-    '&iv_load_policy=3&fs=0&color=white';
-  return iframe;
-}
-
-(function injectGateVideo(){
-  var inner = document.getElementById('gatePlayerInner');
-  if (!inner) return;
-  var iframe = buildIframe(PLAYLIST[currentTrack].id, true, false, true);
-  inner.appendChild(iframe);
-  videoFrame = iframe;
-  updateTrackLabels();
-})();
-
-(function loadYTAPI(){
-  var tag = document.createElement('script');
-  tag.src = 'https://www.youtube.com/iframe_api';
-  var first = document.getElementsByTagName('script')[0];
-  first.parentNode.insertBefore(tag, first);
-})();
-
-function onYouTubeIframeAPIReady(){
-  ytPlayer = new YT.Player('ytVideoFrame', {
-    events: {
-      'onReady': function(){ ytReady = true; startProgressLoop(); },
-      'onStateChange': function(e){
-        if (e.data === 0 && !isHoverTrack) nextTrack(true);
-        if (e.data === 1) startProgressLoop();
-      }
-    }
-  });
-}
-
-function sendYT(func, args){
-  if (!videoFrame || !videoFrame.contentWindow) return;
-  try {
-    videoFrame.contentWindow.postMessage(
-      JSON.stringify({event:'command', func:func, args:args || []}), '*'
-    );
-  } catch(e){}
-}
-
-function loadTrack(index, keepPlaying, loop){
+// ================== CORE: LOAD A TRACK ==================
+function loadTrack(index, shouldPlay){
+  if (!audio) return;
   currentTrack = ((index % PLAYLIST.length) + PLAYLIST.length) % PLAYLIST.length;
   updateTrackLabels();
-  var inner = document.getElementById('gatePlayerInner');
-  if (!inner) return;
-  inner.innerHTML = '';
-  var iframe = buildIframe(PLAYLIST[currentTrack].id, !keepPlaying, loop, true);
-  inner.appendChild(iframe);
-  videoFrame = iframe;
-  if (typeof YT !== 'undefined' && YT.Player){
-    try {
-      ytPlayer = new YT.Player('ytVideoFrame', {
-        events: {
-          'onReady': function(){ ytReady = true; startProgressLoop(); },
-          'onStateChange': function(e){
-            if (e.data === 0 && !isHoverTrack) nextTrack(true);
-            if (e.data === 1) startProgressLoop();
-          }
-        }
-      });
-    } catch(e){}
+  audio.src = PLAYLIST[currentTrack].src;
+  audio.load();
+  if (shouldPlay){
+    var p = audio.play();
+    if (p && p.then){
+      p.then(function(){
+        musicPlaying = true;
+        updateMiniUI();
+      }).catch(function(e){ console.log("Play blocked:", e); });
+    }
   }
-  musicPlaying = true;
-  updateMiniUI();
-  resetProgressUI();
 }
 
-function nextTrack(auto){
-  if (isHoverTrack) return;
-  loadTrack(currentTrack + 1, unlocked || auto, false);
+function nextTrack(){
+  loadTrack(currentTrack + 1, unlocked || musicPlaying);
 }
+
 function prevTrack(){
-  isHoverTrack = false;
-  loadTrack(currentTrack - 1, unlocked, false);
+  loadTrack(currentTrack - 1, unlocked || musicPlaying);
 }
 
-function resetProgressUI(){
-  var f = document.getElementById('spFill');
-  var c = document.getElementById('spTimeCur');
-  var d = document.getElementById('spTimeDur');
-  if (f) f.style.width = '0%';
-  if (c) c.textContent = '0:00';
-  if (d) d.textContent = '0:00';
+function togglePlayback(){
+  if (!audio) return;
+  if (audio.paused){
+    audio.play().then(function(){
+      musicPlaying = true;
+      updateMiniUI();
+    }).catch(function(e){ console.log("Play blocked:", e); });
+  } else {
+    audio.pause();
+    musicPlaying = false;
+    updateMiniUI();
+  }
 }
 
-function startProgressLoop(){
-  if (progressInterval) clearInterval(progressInterval);
-  progressInterval = setInterval(function(){
-    if (!ytPlayer || !ytReady) return;
-    try {
-      var cur = ytPlayer.getCurrentTime ? ytPlayer.getCurrentTime() : 0;
-      var dur = ytPlayer.getDuration ? ytPlayer.getDuration() : 0;
-      if (dur > 0){
-        var pct = (cur / dur) * 100;
-        var f = document.getElementById('spFill');
-        var c = document.getElementById('spTimeCur');
-        var d = document.getElementById('spTimeDur');
-        if (f) f.style.width = pct + '%';
-        if (c) c.textContent = formatTime(cur);
-        if (d) d.textContent = formatTime(dur);
-      }
-    } catch(e){}
-  }, 500);
-}
-
-// HOVER / TOUCH
+// ================== HOVER / TOUCH — ACTUALLY SWITCHES MUSIC ==================
 (function setupHoverMusic(){
   function activateHover(sec){
     if (!unlocked) return;
@@ -835,7 +820,7 @@ function startProgressLoop(){
       isHoverTrack = true;
       var idx = parseInt(sec.getAttribute('data-hover-track'), 10);
       if (isNaN(idx)) return;
-      if (currentTrack !== idx) loadTrack(idx, true, true);
+      if (currentTrack !== idx) loadTrack(idx, true);
     } else {
       if (hoveredSectionEl){
         hoveredSectionEl = null;
@@ -843,7 +828,7 @@ function startProgressLoop(){
         if (resumeTrackIdx !== null){
           var resume = resumeTrackIdx;
           resumeTrackIdx = null;
-          loadTrack(resume, true, false);
+          loadTrack(resume, true);
         }
       }
     }
@@ -862,14 +847,14 @@ function startProgressLoop(){
     if (!sec) return;
     var idx = parseInt(sec.getAttribute('data-hover-track'), 10);
     if (isNaN(idx)) return;
-    if (currentTrack === idx && !isHoverTrack) return;
     hoveredSectionEl = null;
     isHoverTrack = false;
     resumeTrackIdx = null;
-    loadTrack(idx, true, false);
+    loadTrack(idx, true);
   }, { passive: true });
 })();
 
+// ================== CONFETTI ==================
 function launchConfetti(){
   var colors = ['#ff1e1e','#8b0000','#ff5555','#ffffff','#ff3333'];
   for (var i = 0; i < 90; i++){
@@ -890,74 +875,46 @@ function launchConfetti(){
   }
 }
 
+// ================== UNLOCK ==================
 function unlockWebsite(){
   if (unlocked) return;
   unlocked = true;
-  sendYT('unMute', []);
-  sendYT('setVolume', [80]);
-  sendYT('playVideo', []);
-  if (ytPlayer && ytPlayer.unMute){
-    try { ytPlayer.unMute(); ytPlayer.setVolume(80); ytPlayer.playVideo(); } catch(e){}
+  if (audio){
+    audio.play().then(function(){
+      musicPlaying = true;
+      updateMiniUI();
+    }).catch(function(e){ console.log("Play blocked:", e); });
   }
   document.body.classList.remove('locked');
   var gate = document.getElementById('musicGate');
   gate.classList.add('minimized');
-  musicPlaying = true;
   updateMiniUI();
   var badge = document.getElementById('unlock-badge');
   badge.classList.add('active');
   setTimeout(function(){ badge.classList.remove('active'); }, 4000);
   launchConfetti();
-  startProgressLoop();
 }
 
-function togglePlayback(){
-  if (musicPlaying){
-    sendYT('pauseVideo', []);
-    if (ytPlayer && ytPlayer.pauseVideo){ try { ytPlayer.pauseVideo(); } catch(e){} }
-    musicPlaying = false;
-  } else {
-    sendYT('playVideo', []);
-    if (ytPlayer && ytPlayer.playVideo){ try { ytPlayer.playVideo(); } catch(e){} }
-    musicPlaying = true;
-  }
-  updateMiniUI();
-}
-
-function updateMiniUI(){
-  var btn = document.getElementById('miniPlayBtn');
-  var sp = document.getElementById('spPlay');
-  var bars = document.getElementById('miniBars');
-  if (musicPlaying){
-    if (btn) btn.textContent = '❚❚';
-    if (sp) sp.textContent = '❚❚';
-    if (bars) bars.classList.remove('paused');
-  } else {
-    if (btn) btn.textContent = '▶';
-    if (sp) sp.textContent = '▶';
-    if (bars) bars.classList.add('paused');
-  }
-}
-
+// ================== HIDE PLAYER ==================
 function hidePlayer(){
   var gate = document.getElementById('musicGate');
   gate.style.transform = 'translateY(200%) scale(0)';
   gate.style.opacity = '0';
   gate.style.pointerEvents = 'none';
+  if (audio) audio.pause();
   musicPlaying = false;
-  sendYT('pauseVideo', []);
-  if (ytPlayer && ytPlayer.pauseVideo){ try { ytPlayer.pauseVideo(); } catch(e){} }
   updateMiniUI();
 }
 
+// ================== KEYBOARD ==================
 document.addEventListener('keydown', function(e){
   if (!unlocked) return;
   if (e.key === 'm' || e.key === 'M') togglePlayback();
-  if (e.key === 'ArrowRight'){ isHoverTrack = false; hoveredSectionEl = null; nextTrack(); }
-  if (e.key === 'ArrowLeft'){ isHoverTrack = false; hoveredSectionEl = null; prevTrack(); }
+  if (e.key === 'ArrowRight'){ hoveredSectionEl = null; isHoverTrack = false; nextTrack(); }
+  if (e.key === 'ArrowLeft'){ hoveredSectionEl = null; isHoverTrack = false; prevTrack(); }
 });
 
-// SCROLL REVEAL
+// ================== SCROLL REVEAL ==================
 var revealObserver = new IntersectionObserver(function(entries){
   entries.forEach(function(entry){
     if (entry.isIntersecting) entry.target.classList.add('visible');
@@ -968,7 +925,7 @@ document.querySelectorAll('.reveal, .reveal-scale').forEach(function(el){
   revealObserver.observe(el);
 });
 
-// SPOTLIGHT + SECTION CURSOR TRACK
+// ================== SPOTLIGHT + SECTION CURSOR TRACK ==================
 var spotlight = document.getElementById('spotlight');
 document.addEventListener('mousemove', function(e){
   if (spotlight){
@@ -984,7 +941,7 @@ document.addEventListener('mousemove', function(e){
   });
 });
 
-// PARTICLES
+// ================== PARTICLES ==================
 var canvas = document.getElementById('particles-canvas');
 var ctx = canvas.getContext('2d');
 var particlesArray = [];
@@ -1070,7 +1027,7 @@ document.addEventListener('visibilitychange', function(){
   }
 });
 
-// FLOATING EMOJI
+// ================== FLOATING EMOJI ==================
 var floatEmojis = ['🩸','🔪','⚔️','🗡️','🚬','🥃','🖤','❤️‍🔥','🐺'];
 var emojiCount = window.innerWidth < 700 ? 6 : 12;
 for (var i = 0; i < emojiCount; i++){
@@ -1084,15 +1041,21 @@ for (var i = 0; i < emojiCount; i++){
   document.body.appendChild(el);
 }
 
+// ================== INIT ==================
 window.addEventListener('load', function(){
-  updateMiniUI();
   updateTrackLabels();
-  resetProgressUI();
+  updateMiniUI();
+  var f = document.getElementById('spFill');
+  if (f) f.style.width = '0%';
+  var c = document.getElementById('spTimeCur');
+  if (c) c.textContent = '0:00';
+  var d = document.getElementById('spTimeDur');
+  if (d) d.textContent = '0:00';
 });
 
 console.log('%c🩸 ÇUKUR CAFÉ 🩸',
   'background:linear-gradient(135deg,#ff1e1e,#8b0000);color:#fff;font-size:18px;padding:14px 24px;border-radius:8px;font-weight:900;letter-spacing:3px;font-family:Cinzel,serif');
-console.log('%c🎵 Spotify player · 🎬 Inline section videos · 🖱️ Hover/tap to switch · 👁️ View counter · 📺 @KDservices-1','color:#ff5555;font-size:13px;padding:5px');
+console.log('%c🎵 Ad-free player · Hover a section = switch track · 🎬 Inline videos · 👁️ Counter · 📺 @KDservices-1','color:#ff5555;font-size:13px;padding:5px');
 </script>
 </body>
 </html>
